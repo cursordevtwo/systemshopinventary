@@ -54,7 +54,7 @@ ventas: any[] = [];
   selectedSale: any = null;
   private modal: any;
   loading: boolean = true;
-
+  totalIngresos: number = 0;
 
   constructor(
     public global: GlobalService,
@@ -79,9 +79,14 @@ ventas: any[] = [];
     this.realtimeEmployees.employees$.subscribe(employees => {
       this.employees = employees;
     });
+
     this.realtimeVentas.ventas$.subscribe(ventas => {
       this.ventas = ventas;
+      if (ventas) {
+        this.totalIngresos = ventas.reduce((total, venta) => total + (venta.total || 0), 0);
+      }
     });
+  
   }
 
   openSaleDetailsModal(venta: any) {

@@ -100,15 +100,15 @@
                                     <div id="community-support" class="remove-tooltip-title rounded-tooltip-value"></div>
                                 </div>
                                 
-                               <!--  <h4 class="mb-2">
+                                <h4 class="mb-2">
                                     <ng-container *ngIf="totalIngresos !== undefined; else loading">
-                                        {{totalIngresos.length}}
+                                        {{totalIngresos | number:'1.2-2'}}
                                     </ng-container>
                                     <ng-template #loading>
                                         <span>Cargando...</span>
                                     </ng-template>
                                     <span class="text-gray-300">Ingresos</span>
-                                    </h4> -->
+                                    </h4>
                             </div>
                         </div>
                     </div>
