@@ -1,0 +1,124 @@
+<div class="dashboard-main-wrapper">
+    <div class="card mt-24">        
+      <div class="card-body">
+        <div class="breadcrumb mb-24">
+          <ul class="flex-align gap-4">
+              <li><a (click)="global.setRoute('home')" style="cursor: pointer;" class="text-gray-200 fw-normal text-15 hover-text-main-600">Inicio</a></li>
+              <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span> </li>
+              <li><span class="text-main-600 fw-normal text-15">Inventario</span></li>
+          </ul>
+        </div>
+        <!-- Header y botón de agregar -->
+        <div class="d-flex align-items-center justify-content-between">
+          <h4 [hidden]="showForm" class="mb-20">  Productos</h4>
+          <button 
+            *ngIf="!showForm"
+            (click)="showNewProduct()"
+            type="button"
+            class="btn btn-main text-sm btn-sm px-24 rounded-pill py-12 d-flex align-items-center gap-2">
+            <i class="ph ph-plus me-4"></i>
+            Agregar nuevo producto
+          </button>
+        </div>
+  
+        <!-- Tarjetas de Supervisores -->
+        <div class="row g-20 pt-24" [hidden]="showForm">
+          <div class="col-xl-3 col-md-4 col-sm-6" *ngFor="let product of (realtimeProducts.products$ | async)">
+            <div class="mentor-card rounded-8 overflow-hidden">
+              <div class="mentor-card__cover position-relative">
+                <img src="assets/images/thumbs/mentor-cover-img1.png" alt="" class="cover-img">
+                <button type="button" class="follow-btn py-2 px-8 flex-align gap-4 text-13 fw-medium text-white border border-white rounded-pill position-absolute inset-block-start-0 inset-inline-end-0 mt-8 me-8 transition-1"> 
+                  <i class="ph ph-pencil d-flex"></i> 
+                  <span class="text">Editar</span>
+                </button>
+              </div>
+              <div class="mentor-card__content text-center">
+                <!-- <div class="w-56 h-56 rounded-circle overflow-hidden border border-white d-inline-block">
+                  <a >
+                    <img [src]="product.image" alt="" class="mentor-card__img cover-img">
+                  </a>
+                </div> -->
+               
+                <h2 class="mb-0" style="font-size: 18px; padding-top: 20px;">
+                  <a > {{ product.name }}</a>
+                </h2>
+                <p class="mt-20 text-gray-600 text-14 text-line-2"><i class="ph-fill ph-money"></i> Precio: {{ product.price }}</p>
+                <p class="mt-20 text-gray-600 text-14 text-line-2"><i class="ph-fill ph-plus"></i>Descripcion: {{ product.description }}</p>
+                <div class="mentor-card__rating mt-20 border border-gray-100 px-8 py-6 rounded-8 flex-between flex-wrap">
+                  <div class="flex-align gap-4">
+                    <span class="text-15 fw-normal text-main-600 d-flex"><i class="ph-fill ph-bookmarks"></i></span>
+                    <span class="text-13 fw-normal text-gray-600">Unidades: {{ product.unity }} </span>
+                  </div>
+                 
+                  <div class="flex-align gap-4">
+                    <span class="text-15 fw-normal text-main-600 d-flex"><i class="ph-fill ph-code"></i></span>
+                    <span class="text-13 fw-normal text-gray-600">Codigo: {{ product.code }} </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Formulario de Nuevo Supervisor -->
+        <div class="card mt-24" [hidden]="!showForm">
+          <div class="card-header border-bottom">
+            <h4 class="mb-4">Nuevo producto</h4>
+            <p class="text-gray-600 text-15">Ingrese todos los datos del producto</p>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="productForm" (ngSubmit)="addProduct()">
+              <div class="row gy-4">
+                <div class="col-sm-6 col-xs-6">
+                  <label for="name" class="form-label mb-8 h6">Nombre</label>
+                  <input formControlName="name" type="text" class="form-control py-11" id="name" placeholder="Nombre del producto">
+                </div>
+                <div class="col-sm-6 col-xs-6">
+                  <label for="code" class="form-label mb-8 h6">Codigo</label>
+                  <input formControlName="code" type="number" class="form-control py-11" id="code" placeholder="Ingrese codigo">
+                </div>
+                <div class="col-sm-6 col-xs-6">
+                    <label for="description" class="form-label mb-8 h6">Descripcion</label>
+                    <input formControlName="description" type="text" class="form-control py-11" id="description" placeholder="Ingrese descripcion">
+                  </div>
+                  <div class="col-sm-6 col-xs-6">
+                    <label for="unity" class ="form-label mb-8 h6">Unidad</label>
+                    <input formControlName="unity" type="number" class="form-control py-11" id="unity" placeholder="Ingrese unidades">
+                  </div>
+                  <div class="col-sm-6 col-xs-6">
+                    <label for="price" class="form-label mb-8 h6">Precio</label>
+                    <input formControlName="price" type="number" class="form-control py-11" id="price" placeholder="Ingrese precio">
+                  </div>
+                
+                <div class="col-12">
+                  <label for="imageUpload" class="form-label mb-8 h6">Your Photo</label>
+                  <div class="flex-align gap-22">
+                    <div class="avatar-upload flex-shrink-0">
+                      <input type="file" id="imageUpload" (change)="onFileChange($event)" accept=".png, .jpg, .jpeg">
+                      <div class="avatar-preview">
+                        <div id="profileImagePreview" [style.background-image]="'url(' + previewImage + ')'"></div>
+                      </div>
+                    </div>
+                    <div class="avatar-upload-box text-center position-relative flex-grow-1 py-24 px-4 rounded-16 border border-main-300 border-dashed bg-main-50 hover-bg-main-100 hover-border-main-400 transition-2 cursor-pointer">
+                      <label for="imageUpload" class="position-absolute inset-block-start-0 inset-inline-start-0 w-100 h-100 rounded-16 cursor-pointer z-1"></label>
+                      <span class="text-32 icon text-main-600 d-inline-flex"><i class="ph ph-upload"></i></span>
+                      <span class="text-13 d-block text-gray-400 text my-8">Click to upload or drag and drop</span>
+                      <span class="text-13 d-block text-main-600">SVG, PNG, JPEG OR GIF (max 1080px1200px)</span>
+                    </div>
+                  </div>
+                </div>
+            
+                <div class="col-12">
+                  <div class="flex-align justify-content-end gap-8">
+                    <button type="button" (click)="showForm=false" class="btn btn-outline-main bg-main-100 border-main-100 text-main-600 rounded-pill py-9">Cancel</button>
+                    <button type="submit" class="btn btn-main rounded-pill py-9">Guardar</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

@@ -1,0 +1,308 @@
+<div class="dashboard-main-wrapper">
+    <div class="top-navbar  gap-16">
+        <div class="row">
+            <div class="col-12" style="text-align: right;">
+                <div class="fecha-hora">
+                    <span class="fecha">{{fechaActual}}</span> /
+                    <span class="hora ms-2">{{horaActual}}</span>
+                </div>
+            </div>
+            <div class="flex-align gap-16 col-8">
+                <h1>Caja registradora</h1>
+
+                <!-- resto de tu código -->
+            </div>
+            <div class="dashboard-body">
+                <div class="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+                    <!-- Breadcrumb Start -->
+                    <div class="breadcrumb mb-24">
+                        <ul class="flex-align gap-4">
+                            <li><a (click)="global.setRoute('home')" style="cursor: pointer;"
+                                    class="text-gray-200 fw-normal text-15 hover-text-main-600">Inicio</a></li>
+                            <li> <span class="text-gray-500 fw-normal d-flex"><i class="ph ph-caret-right"></i></span>
+                            </li>
+                            <li><span class="text-main-600 fw-normal text-15">Caja</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <ul class="step-list mb-24">
+                    <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6"
+                        [ngClass]="{'active': pasoActual === 1}">
+                        <span class="icon text-xl d-flex"><i class="ph ph-circle"></i></span>
+                        Productos
+                        <span class="line position-relative"></span>
+                    </li>
+                    <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6"
+                        [ngClass]="{'active': pasoActual === 2}">
+                        <span class="icon text-xl d-flex"><i class="ph ph-circle"></i></span>
+                        Procesar pago
+                        <span class="line position-relative"></span>
+                    </li>
+                    <li class="step-list__item py-15 px-24 text-15 text-heading fw-medium flex-center gap-6"
+                        [ngClass]="{'active': pasoActual === 3}">
+                        <span class="icon text-xl d-flex"><i class="ph ph-circle"></i></span>
+                        Imprimir factura
+                        <span class="line position-relative"></span>
+                    </li>
+                </ul>
+            </div>
+            <div class="flex-align gap-16 col-8">
+                <form class="w-350 d-sm-block d-none">
+                    <!-- cash.component.html -->
+                    <div class="position-relative">
+                        <!-- Input de búsqueda -->
+                        <form class="w-350 d-sm-block d-none">
+                            <div class="position-relative">
+                                <button type="submit"
+                                    class="input-icon text-xl d-flex text-gray-100 pointer-event-none">
+                                    <i class="ph ph-magnifying-glass"></i>
+                                </button>
+                                <input type="text"
+                                    class="form-control ps-40 h-40 border-transparent focus-border-main-600 bg-main-50 rounded-pill placeholder-15"
+                                    placeholder="Buscar producto por nombre o código" [(ngModel)]="searchTerm"
+                                    (input)="onSearchChange($event)" name="search">
+                            </div>
+                        </form>
+
+                        <!-- Lista de productos filtrados -->
+                        <div class="productos-filtrados position-absolute w-100 mt-2"
+                            style="background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 1000;"
+                            *ngIf="productosFiltrados.length > 0 && searchTerm">
+                            <div class="list-group">
+                                <div *ngFor="let producto of productosFiltrados"
+                                    class="list-group-item list-group-item-action cursor-pointer"
+                                    style="padding: 10px 15px; border-bottom: 1px solid #eee;"
+                                    (click)="seleccionarProducto(producto)">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{producto.name}}</strong>
+                                            <br>
+                                            <small>Código: {{producto.code}}</small>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-primary">{{producto.price | currency}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+            <!-- Contenido según el paso actual -->
+            <div [ngSwitch]="pasoActual">
+                <!-- Paso 1: Selección de productos -->
+                <!-- Paso 1: Selección de productos -->
+                <div *ngSwitchCase="1">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Selección de Productos</h3>
+                            <!-- Mostrar productos seleccionados -->
+                            <div class="table-responsive" *ngIf="productosSeleccionados.length > 0">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio</th>
+                                            <th>Subtotal</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let producto of productosSeleccionados">
+                                            <td>{{producto.name}}</td>
+                                            <td>
+                                                <input type="number" [(ngModel)]="producto.cantidad"
+                                                    (change)="calcularTotal()" min="1" class="form-control w-75">
+                                            </td>
+                                            <td>{{producto.price | currency}}</td>
+                                            <td>{{producto.price * producto.cantidad | currency}}</td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm"
+                                                    (click)="eliminarProducto(producto)">
+                                                    <i class="ph ph-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Botón para continuar -->
+                            <div class="d-flex justify-content-end mt-4">
+                                <button class="btn btn-primary" (click)="irAPaso(2)"
+                                    [disabled]="productosSeleccionados.length === 0">
+                                    Continuar <i class="ph ph-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Paso 2: Procesar pago -->
+                <div *ngSwitchCase="2">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Resumen de la venta</h3>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio</th>
+                                            <th>Subtotal</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let producto of productosSeleccionados">
+                                            <td>{{producto.name}}</td>
+                                            <td>
+                                                <input type="number" [(ngModel)]="producto.cantidad"
+                                                    (change)="calcularTotal()" min="1" class="form-control w-75">
+                                            </td>
+                                            <td>{{producto.price | currency}}</td>
+                                            <td>{{producto.price * producto.cantidad | currency}}</td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm"
+                                                    (click)="eliminarProducto(producto)" title="Eliminar producto">
+                                                    <i class="ph ph-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                            <div class="row justify-content-end mt-4">
+                                <div class="col-md-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Subtotal:</span>
+                                        <strong>{{subtotal | currency}}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>IVA (16%):</span>
+                                        <strong>{{iva | currency}}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Total:</span>
+                                        <strong>{{total | currency}}</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-secondary" (click)="irAPaso(1)">
+                                    <i class="ph ph-arrow-left"></i> Volver
+                                </button>
+                                <button class="btn btn-primary" (click)="irAPaso(3)">
+                                    Proceder al pago <i class="ph ph-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Paso 3: Imprimir factura -->
+                <div *ngSwitchCase="3">
+                    <div class="row">
+                        <!-- Columna de métodos de pago -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h3>Método de pago</h3>
+                                    <div class="form-group mb-4">
+                                        <select class="form-select" [(ngModel)]="metodoPago">
+                                            <option value="">Seleccione un método de pago</option>
+                                            <option value="tarjeta">Pago con tarjeta</option>
+                                            <option value="efectivo">Pago en efectivo</option>
+                                            <option value="simple">SimplePago</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button class="btn btn-secondary" (click)="irAPaso(2)">
+                                            <i class="ph ph-arrow-left"></i> Volver
+                                        </button>
+                                        <button class="btn btn-success" (click)="procesarPago()">
+                                            Finalizar venta <i class="ph ph-check"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna de vista previa de factura -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="factura-preview">
+                                        <!-- Logo y encabezado -->
+                                        <div class="text-center mb-4">
+                                            <img src="assets/images/logo.png" alt="Logo" class="mb-3"
+                                                style="max-height: 80px;">
+                                            <h4>Factura</h4>
+                                        </div>
+
+                                        <!-- Información de la factura -->
+                                        <div class="mb-3">
+                                            <strong>Fecha:</strong> {{fechaActual | date:'yyyy-MM-dd'}} {{horaActual}}
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Cliente:</strong> Cliente General
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Método de pago:</strong> {{metodoPago}}
+                                        </div>
+                                        <!-- Tabla de productos -->
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Producto</th>
+                                                    <th>Cant.</th>
+                                                    <th>Precio</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let producto of productosSeleccionados">
+                                                    <td>{{producto.name}}</td>
+                                                    <td>{{producto.cantidad}}</td>
+                                                    <td>{{producto.price | currency}}</td>
+                                                    <td>{{producto.price * producto.cantidad | currency}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <!-- Totales -->
+                                        <div class="totales mt-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Subtotal:</span>
+                                                <strong>{{subtotal | currency}}</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>IVA (16%):</span>
+                                                <strong>{{iva | currency}}</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Total:</span>
+                                                <strong>{{total | currency}}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+
+</div>  
