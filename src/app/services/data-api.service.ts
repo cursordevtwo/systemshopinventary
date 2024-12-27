@@ -4,13 +4,12 @@ import { GlobalService } from './global.service';
 import { map} from 'rxjs/operators';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { WorkInstructionService } from './work-instruction.service';
 import { ProductService } from './product.service';
-export interface workInstructionsInterface{
-}
 export interface productInterface{
 }
 export interface ventaInterface{
+}
+export interface employeeInterface{
 }
 @Injectable({
   providedIn: 'root'
@@ -27,15 +26,7 @@ export class DataApiService {
     "Content-Type":"application/json"	
 });
 
-  getAllWorkInstructions(): Observable<WorkInstructionService []> {
-    return this.http.get<WorkInstructionService[]>(`${this.baseUrl}/collections/workInstructions/records`);
-  }
-  saveworkInstructions(request: workInstructionsInterface) {
-    const url_api = this.baseUrl + '/collections/workInstructions/records';
-		return this.http.post<workInstructionsInterface>(url_api, request).pipe(
-		  map(data => data)
-		);
-	  }
+  
   
   addProduct(request: productInterface) {
     const url_api = this.baseUrl + '/collections/productsInventory/records';
@@ -68,6 +59,13 @@ export class DataApiService {
   deleteProduct(productId: string) {
     const url_api = this.baseUrl + `/collections/productsInventory/records/${productId}`;
     return this.http.delete<productInterface>(url_api).pipe(
+      map(data => data)
+    );
+  }
+
+  deleteEmployee(employeeId: string) {
+    const url_api = this.baseUrl + `/collections/employees/records/${employeeId}`;
+    return this.http.delete<employeeInterface>(url_api).pipe(
       map(data => data)
     );
   }

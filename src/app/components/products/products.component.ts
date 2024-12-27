@@ -58,7 +58,7 @@ export class ProductsComponent {
   }
   openNewCategoryModal() {
     const dialogRef = this.dialog.open(NewCategoryModalComponent, {
-      width: '400px',
+      width: '600px',
       data: {}
     });
 
@@ -69,12 +69,7 @@ export class ProductsComponent {
       }
     });
   }
-
-  // Alternar la visibilidad del formulario
-/*   showNewProduct() {
-    this.showForm = !this.showForm;
-  } */
-    showNewProduct() {
+  showNewProduct() {
       this.showForm = !this.showForm;
       if (this.showForm) {
         this.isEditing = false;

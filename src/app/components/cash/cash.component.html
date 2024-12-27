@@ -153,8 +153,8 @@
                                         <tr>
                                             <th>Producto</th>
                                             <th>Cantidad</th>
-                                            <th>Precio</th>
-                                            <th>Subtotal</th>
+                                            <th>Precio/Unidad</th>
+                                            <!-- <th>Subtotal</th> -->
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -166,7 +166,7 @@
                                                     (change)="calcularTotal()" min="1" class="form-control w-75">
                                             </td>
                                             <td>{{producto.price | currency}}</td>
-                                            <td>{{producto.price * producto.cantidad | currency}}</td>
+                                            <!-- <td>{{producto.price * producto.cantidad | currency}}</td> -->
                                             <td>
                                                 <button class="btn btn-danger btn-sm"
                                                     (click)="eliminarProducto(producto)" title="Eliminar producto">
@@ -179,7 +179,7 @@
                             </div>
 
 
-                            <div class="row justify-content-end mt-4">
+                            <!-- <div class="row justify-content-end mt-4">
                                 <div class="col-md-4">
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>Subtotal:</span>
@@ -188,7 +188,17 @@
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>IVA (16%):</span>
                                         <strong>{{iva | currency}}</strong>
+                                    </div> 
+                                   
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Total:</span>
+                                        <strong>{{total | currency}}</strong>
                                     </div>
+                                </div>
+                                
+                            </div> -->
+                            <div class="row justify-content-end mt-4">
+                                <div class="col-md-4">
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>Total:</span>
                                         <strong>{{total | currency}}</strong>
@@ -214,6 +224,12 @@
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
+                                    <h3>Información del cliente</h3>
+                                    <div class="mb-3">
+                                        <strong>Cliente:</strong>
+                                        <input type="text" class="form-control mt-1" [(ngModel)]="customer"
+                                            name="customer" placeholder="Ingrese el nombre del cliente">
+                                    </div>
                                     <h3>Método de pago</h3>
                                     <div class="form-group mb-4">
                                         <select class="form-select" [(ngModel)]="metodoPago">
@@ -228,11 +244,13 @@
                                         <button class="btn btn-secondary" (click)="irAPaso(2)">
                                             <i class="ph ph-arrow-left"></i> Volver
                                         </button>
-                                        <button class="btn btn-success" (click)="procesarPago()">
+                                        <button class="btn btn-success" (click)="procesarPago()"
+                                            [disabled]="!metodoPago || !customer"> <!-- Añadir esta validación -->
                                             Finalizar venta <i class="ph ph-check"></i>
                                         </button>
                                     </div>
                                 </div>
+                                
                             </div>
                         </div>
 
@@ -243,17 +261,20 @@
                                     <div class="factura-preview">
                                         <!-- Logo y encabezado -->
                                         <div class="text-center mb-4">
-                                            <img src="assets/images/logo.png" alt="Logo" class="mb-3"
+                                            <img src="assets/images/logo/logo.png" alt="Logo" class="mb-3"
                                                 style="max-height: 80px;">
                                             <h4>Factura</h4>
                                         </div>
 
                                         <!-- Información de la factura -->
-                                        <div class="mb-3">
-                                            <strong>Fecha:</strong> {{fechaActual | date:'yyyy-MM-dd'}} {{horaActual}}
+                                        <div class="mt-3">
+                                            <div class="fecha-hora">
+                                                <span class="fecha">{{fechaActual | date:'dd/MM/yyyy'}}</span> /
+                                                <span class="hora ms-2">{{horaActual}}</span>
+                                            </div>
                                         </div>
                                         <div class="mb-3">
-                                            <strong>Cliente:</strong> Cliente General
+                                            <strong>Cliente:</strong> {{customer}}
                                         </div>
                                         <div class="mb-3">
                                             <strong>Método de pago:</strong> {{metodoPago}}
@@ -264,7 +285,7 @@
                                                 <tr>
                                                     <th>Producto</th>
                                                     <th>Cant.</th>
-                                                    <th>Precio</th>
+                                                    <th>Precio/Unidad</th>
                                                     <th>Total</th>
                                                 </tr>
                                             </thead>
@@ -279,7 +300,7 @@
                                         </table>
 
                                         <!-- Totales -->
-                                        <div class="totales mt-3">
+                                        <!-- <div class="totales mt-3">
                                             <div class="d-flex justify-content-between mb-2">
                                                 <span>Subtotal:</span>
                                                 <strong>{{subtotal | currency}}</strong>
@@ -292,6 +313,12 @@
                                                 <span>Total:</span>
                                                 <strong>{{total | currency}}</strong>
                                             </div>
+                                        </div> -->
+                                        <div class="totales mt-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Total:</span>
+                                                <strong>{{total | currency}}</strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -299,10 +326,10 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
 
     </div>
 
-</div>  
+</div>

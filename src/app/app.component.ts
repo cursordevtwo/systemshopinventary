@@ -9,9 +9,6 @@ import { CommonModule } from '@angular/common';
 import { LoginComponent } from './components/login/login.component';
 import { FormRequestComponent } from "./components/form-request/form-request.component";
 import { AuthPocketbaseService } from './services/auth-pocketbase.service';
-import { TechnicalsComponent } from './components/technicals/technicals.component';
-import { WorkInstructionsComponent } from './components/work-instructions/work-instructions.component';
-import { HttpClient, HttpClientModule } from '@angular/common/http'; 
 import { ProductsComponent } from './components/products/products.component';
 import { EmployeesComponent } from './components/employees/employees.component';
 import { CashComponent } from './components/cash/cash.component';
@@ -34,9 +31,6 @@ import { MatButtonModule } from '@angular/material/button';
     RegisterComponent,
     LoginComponent,
     FormRequestComponent,
-    TechnicalsComponent,
-    WorkInstructionsComponent,
-    HttpClientModule,
     ProductsComponent,
     EmployeesComponent,
     CashComponent,

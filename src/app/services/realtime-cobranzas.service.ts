@@ -3,56 +3,53 @@ import PocketBase from 'pocketbase';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class RealtimeWorkInstructionsService implements OnDestroy {
+export class RealtimeCobranzasService implements OnDestroy {
   private pb: PocketBase;
-  private workInstructionsSubject = new BehaviorSubject<any[]>([]);
+  private cobranzasSubject = new BehaviorSubject<any[]>([]);
 
   // Esta es la propiedad que expondrá el Observable para que los componentes puedan suscribirse a ella
-  public workInstructions$: Observable<any[]> =
-    this.workInstructionsSubject.asObservable();
+  public cobranzas$: Observable<any[]> =
+    this.cobranzasSubject.asObservable();
 
   constructor() {
     this.pb = new PocketBase('https://db.buckapi.com:8095');
-    this.subscribeToWorkInstructions();
+    this.subscribeToCobranzas();
   }
 
-  private async subscribeToWorkInstructions() {
+  private async subscribeToCobranzas() {
     // (Opcional) Autenticación
     await this.pb
       .collection('users')
       .authWithPassword('admin@email.com', 'admin1234');
 
-    // Suscribirse a cambios en cualquier registro de la colección 'supervisors'
-    this.pb.collection('tworkInstructions').subscribe('*', (e) => {
+    this.pb.collection('cobranzas').subscribe('*', (e) => {
       this.handleRealtimeEvent(e);
     });
 
-    // Inicializar la lista de esupervisoras
-    this.updateworkInstructionsList();
+    this.updateCobranzasList();
   }
 
   private handleRealtimeEvent(event: any) {
     // Aquí puedes manejar las acciones 'create', 'update' y 'delete'
     console.log(event.action);
     console.log(event.record);
-    // Actualizar la lista de esupervisoras
-    this.updateworkInstructionsList();
+
+    this.updateCobranzasList();
   }
 
-  private async updateworkInstructionsList() {
-    // Obtener la lista actualizada de esupervisoras
+  private async updateCobranzasList() {
     const records = await this.pb
-      .collection('workInstructions')
+      .collection('cobranzas')
       .getFullList(200 /* cantidad máxima de registros */, {
         sort: '-created', // Ordenar por fecha de creación
       });
-    this.workInstructionsSubject.next(records);
+    this.cobranzasSubject.next(records);
   }
 
   ngOnDestroy() {
     // Desuscribirse cuando el servicio se destruye
-    this.pb.collection('workInstructions').unsubscribe('*');
+    this.pb.collection('cobranzas').unsubscribe('*');
   }
 }

@@ -27,8 +27,9 @@
             <div class="mentor-card rounded-8 overflow-hidden">
               <div class="mentor-card__cover position-relative" style="background-color: black;">
               <!--   <img src="assets/images/thumbs/mentor-cover-img1.png" alt="" class="cover-img"> -->
-                <button type="button" class="follow-btn py-2 px-8 flex-align gap-4 text-13 fw-medium text-white border border-white rounded-pill position-absolute inset-block-start-0 inset-inline-end-0 mt-8 me-8 transition-1"> 
-                  <i class="ph ph-plus d-flex"></i> 
+                <button type="button" class="follow-btn py-2 px-8 flex-align gap-4 text-13 fw-medium text-white border border-white rounded-pill 
+                position-absolute inset-block-start-0 inset-inline-end-0 mt-8 me-8 transition-1" (click)="deleteEmployee(employee.id)"> 
+                  <i class="ph ph-trash d-flex"></i> 
                   <span class="text">Eliminar</span>
                 </button>
               </div>

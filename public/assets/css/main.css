@@ -106,6 +106,7 @@
     --size-164: 10.25rem;
     --size-190: 11.875rem;
     --main-50: hsl(var(--main-h), var(--main-s), calc(var(--main-l) + (100% - var(--main-l)) * 0.9));
+    
     --main-100: hsl(var(--main-h), var(--main-s), calc(var(--main-l) + (100% - var(--main-l)) * 0.8));
     --main-200: hsl(var(--main-h), var(--main-s), calc(var(--main-l) + (100% - var(--main-l)) * 0.7));
     --main-300: hsl(var(--main-h), var(--main-s), calc(var(--main-l) + (100% - var(--main-l)) * 0.6));

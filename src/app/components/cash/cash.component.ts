@@ -9,7 +9,7 @@ import { AuthPocketbaseService } from '../../services/auth-pocketbase.service';
 import { DataApiService } from '../../services/data-api.service';
 import { RealtimeVentasService } from '../../services/realtime-ventas.service';
 export interface VentaInterface {
-  cliente: string;
+  customer: string;
   fecha: string;
   hora: string;
   metodoPago: string;
@@ -48,7 +48,7 @@ export class CashComponent {
   subtotal: number = 0;
   iva: number = 0;
   total: number = 0;
-  cliente: string = '';
+  customer: string = '';
   cantidad: number = 0;
   currentUser: any = null;
   pb: any;
@@ -61,7 +61,6 @@ export class CashComponent {
     precio: number;
     subtotal: number;
   }[] = []; 
-  
   constructor
   (public global: GlobalService,
     public realtimeProducts: RealtimeProductsService,
@@ -190,7 +189,7 @@ export class CashComponent {
       });
     }
   
-    calcularTotal() {
+   /*  calcularTotal() {
       // Calcular subtotal
       this.subtotal = this.productosSeleccionados.reduce((total, producto) => {
         return total + (producto.price * producto.cantidad);
@@ -201,8 +200,12 @@ export class CashComponent {
   
       // Calcular total
       this.total = this.subtotal + this.iva;
-    }
-  
+    } */
+    calcularTotal() {
+      this.total = this.productosSeleccionados.reduce((total, producto) => {
+          return total + (producto.price * producto.cantidad);
+      }, 0);
+  }
     // Funciones para navegar entre pasos
     irAPaso(paso: number) {
       this.pasoActual = paso;
@@ -224,68 +227,42 @@ export class CashComponent {
       hour12: false // Para formato 24 horas
     });
   } 
-  
+  // procesarVenta() {
+  //   console.log('Procesando venta...');
+  //   console.log('Productos seleccionados:', this.productosSeleccionados);
+  //   console.log('Subtotal:', this.subtotal);
+  //   console.log('IVA:', this.iva);
+  //   console.log('Total:', this.total);
+  // }
   procesarVenta() {
     console.log('Procesando venta...');
     console.log('Productos seleccionados:', this.productosSeleccionados);
-    console.log('Subtotal:', this.subtotal);
-    console.log('IVA:', this.iva);
+    console.log('Customer:', this.customer);
     console.log('Total:', this.total);
   }
 
   finalizarVenta() {
     console.log('Finalizando venta...');
     console.log('Productos seleccionados:', this.productosSeleccionados);
-    console.log('Subtotal:', this.subtotal);
-    console.log('IVA:', this.iva);
+    console.log('Customer:', this.customer);
     console.log('Total:', this.total);
   }
 
   imprimirFactura() {
     console.log('Imprimiendo factura...');
     console.log('Productos seleccionados:', this.productosSeleccionados);
-    console.log('Subtotal:', this.subtotal);
-    console.log('IVA:', this.iva);
+    console.log('Customer:', this.customer);
     console.log('Total:', this.total);
   }
 
   cancelarVenta() {
     console.log('Cancelando venta...');
     console.log('Productos seleccionados:', this.productosSeleccionados);
-    console.log('Subtotal:', this.subtotal);
-    console.log('IVA:', this.iva);
+    console.log('Customer:', this.customer);
     console.log('Total:', this.total);
   }
 
 /* procesarPago() {
-  const ventaData = {
-      cliente: "Cliente General",
-      total: this.total,
-      unity: this.calculateTotalUnits(),
-      subTotal: this.subtotal.toString(),
-      statusVenta: "completed",
-      descuento: "0",
-      iva: this.iva.toString(),
-      metodoPago: this.metodoPago,
-      date: new Date().toISOString(),
-      hora: this.horaActual,
-      idProduct: JSON.stringify(this.productosSeleccionados),
-      idUser: "current_user_id" // Replace with actual user ID
-  };
-
-  // Call your service to save the sale
-  this.dataApiService.saveVenta(ventaData).subscribe(
-      response => {
-          console.log('Venta guardada exitosamente', response);
-          // Handle success
-      },
-      error => {
-          console.error('Error al guardar la venta', error);
-          // Handle error
-      }
-  );
-} */
-procesarPago() {
   // Validate payment method
   if (!this.metodoPago) {
     Swal.fire({
@@ -300,7 +277,7 @@ procesarPago() {
   // Show confirmation dialog
   Swal.fire({
     title: '¿Confirmar venta?',
-    text: `Total a pagar: ${this.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}`,
+    text: `Total a pagar: ${this.total.toLocaleString('es-col', { style: 'currency', currency: 'colones' })}`,
     icon: 'question',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
@@ -310,13 +287,13 @@ procesarPago() {
   }).then((result) => {
     if (result.isConfirmed) {
       const ventaData = {
-        cliente: "Cliente General",
+        customer: this.customer,
         total: this.total,
         unity: this.calculateTotalUnits(),
         subTotal: this.subtotal.toString(),
         statusVenta: "completed",
         descuento: "0",
-        iva: this.iva.toString(),
+        // iva: this.iva.toString(),
         metodoPago: this.metodoPago,
         date: new Date().toISOString(),
         hora: this.horaActual,
@@ -333,7 +310,8 @@ procesarPago() {
             timer: 2000,
             showConfirmButton: false
           }).then(() => {
-            this.reiniciarVenta();
+            this.resetearVenta();
+            this.irAPaso(3);
           });
         },
         error => {
@@ -348,28 +326,27 @@ procesarPago() {
       );
     }
   });
-}
+} */
 
 private calculateTotalUnits(): number {
   return this.productosSeleccionados.reduce((total, producto) => total + producto.cantidad, 0);
 }
-/* procesarPago() {
-  // Validar si se seleccionó un método de pago
-  if (!this.metodoPago) {
+procesarPago() {
+  if (!this.metodoPago || !this.customer) {
     Swal.fire({
       title: 'Error',
-      text: 'Por favor seleccione un método de pago',
+      text: 'Por favor complete todos los campos requeridos',
       icon: 'error',
       confirmButtonText: 'Ok'
     });
     return;
   }
 
-  // Mostrar mensaje de confirmación
+  // Add confirmation dialog
   Swal.fire({
-    title: '¿Confirmar venta?',
-    text: `Total a pagar: ${this.total.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}`,
-    icon: 'question',
+    title: '¿Está seguro de procesar la venta?',
+    text: `Total a pagar: $${this.total.toFixed(2)}`,
+    icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
@@ -377,25 +354,23 @@ private calculateTotalUnits(): number {
     cancelButtonText: 'Cancelar'
   }).then((result) => {
     if (result.isConfirmed) {
-      // Preparar los datos de la venta
       const venta = {
-        cliente: "Cliente General", // Puedes cambiar según tus necesidades
-        fecha: this.fechaActual,    // Variable con la fecha actual
-        hora: this.horaActual,      // Variable con la hora actual
-        metodoPago: this.metodoPago,
-        subtotal: this.subtotal,
-        iva: this.iva,
+        customer: this.customer,
+        paymentMethod: this.metodoPago,
+        products: this.productosSeleccionados,
         total: this.total,
-        productos: this.productosSeleccionados.map(producto => ({
-          idProducto: producto.id,  // Suponiendo que cada producto tiene un campo `id`
-          nombre: producto.name,
-          cantidad: producto.cantidad,
-          precio: producto.price,
-          subtotal: producto.cantidad * producto.price
-        }))
+        idUser: this.currentUser.id,
+        unity: this.calculateTotalUnits(),
+        subTotal: this.subtotal.toString(),
+        statusVenta: "completed",
+        descuento: "0",
+        // iva: this.iva.toString(),
+        metodoPago: this.metodoPago,
+        date: new Date().toISOString(),
+        hora: this.horaActual,
+        idProduct: JSON.stringify(this.productosSeleccionados),
       };
 
-      // Guardar en la base de datos usando el servicio
       this.dataApiService.saveVenta(venta).subscribe(
         (response) => {
           Swal.fire({
@@ -405,8 +380,8 @@ private calculateTotalUnits(): number {
             timer: 2000,
             showConfirmButton: false
           }).then(() => {
-            // Reiniciar el componente para una nueva venta
-            this.reiniciarVenta();
+            this.resetearVenta();
+            this.irAPaso(1);
           });
         },
         (error) => {
@@ -416,19 +391,18 @@ private calculateTotalUnits(): number {
             icon: 'error',
             confirmButtonText: 'Ok'
           });
+          console.error('Error:', error);
         }
       );
     }
   });
-} */
-
-reiniciarVenta() {
-    this.productosSeleccionados = [];
-    this.subtotal = 0;
-    this.iva = 0;
-    this.total = 0;
-    this.metodoPago = '';
-    this.pasoActual = 1;
+}
+  
+private resetearVenta() {
+  this.productosSeleccionados = [];
+  this.customer = '';
+  this.metodoPago = '';
+  this.total = 0;
   }
 
   private getCurrentUserInfo() {
