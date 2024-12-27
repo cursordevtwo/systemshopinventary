@@ -12,7 +12,16 @@ import { HttpClient } from '@angular/common/http';
 import { DataApiService } from '../../services/data-api.service';
 import Swal from 'sweetalert2';
 import { RealtimeCuentasxcobrarService } from '../../services/realtime-cuentasxcobrar.service';
-
+interface Operacion {
+  fecha: Date;
+  tipo: 'pagar' | 'cobrar';
+  proveedor?: string;
+  cliente?: string;
+  monto: number;
+  estado: 'pendiente' | 'completado';
+  metodoPago: string;
+  nota?: string;
+}
 @Component({
   selector: 'app-contabilidad',
   standalone: true,
@@ -20,6 +29,7 @@ import { RealtimeCuentasxcobrarService } from '../../services/realtime-cuentasxc
   templateUrl: './contabilidad.component.html',
   styleUrl: './contabilidad.component.css'
 })
+
 export class ContabilidadComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private modalInstance: any;
@@ -34,6 +44,7 @@ export class ContabilidadComponent implements OnInit {
   totalCuentasPorPagar: number = 0;
   totalCuentasPorCobrar: number = 0;
   totalCajaChica: number = 0;
+  operaciones: Operacion[] = [];
 constructor(
   public realtimeVentas: RealtimeVentasService,
   public realtimeProductos: RealtimeProductsService,
@@ -228,6 +239,12 @@ async guardarCuentaPorCobrar() {
     });
   }
 }
+agregarOperacion(operacion: Operacion) {
+  this.operaciones.unshift(operacion); // Añade al inicio del array
+  this.operaciones.sort((a, b) => b.fecha.getTime() - a.fecha.getTime()); // Ordena por fecha descendente
+}
 
-
+verDetalles(operacion: Operacion) {
+  // Implementa la lógica para mostrar los detalles
+}
 }
