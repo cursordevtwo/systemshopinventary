@@ -11,6 +11,8 @@ export interface ventaInterface{
 }
 export interface employeeInterface{
 }
+export interface cobranzaInterface{
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -76,4 +78,11 @@ export class DataApiService {
       map(data => data)
     );
   }
+  addCobranza(request: cobranzaInterface) {
+    const url_api = this.baseUrl + '/collections/cobranzas/records';
+		return this.http.post<cobranzaInterface>(url_api, request).pipe(
+		  map(data => data)
+		);
+	  }
+    
 }

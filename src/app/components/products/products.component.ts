@@ -9,6 +9,7 @@ import { RealtimeProductsService } from '../../services/realtime-productos.servi
 import { RealtimeCategoriasService } from '../../services/realtime-categorias.service';
 import { NewCategoryModalComponent } from '../new-category-modal/new-category-modal.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { RealtimeVentasService } from '../../services/realtime-ventas.service';
 
 @Component({
   selector: 'app-products',
@@ -31,6 +32,8 @@ export class ProductsComponent {
   products$: any;
   isEditing = false;
   currentProductId: string = '';
+  showFilter = false;
+  ventas: any[] = [];
   constructor(
     public global: GlobalService,
     private fb: FormBuilder,
@@ -38,7 +41,8 @@ export class ProductsComponent {
     public realtimeProducts: RealtimeProductsService,
     public dataApiService: DataApiService,
     public realtimeCategorias: RealtimeCategoriasService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public realtimeVentas: RealtimeVentasService
 
   ) {
     this.realtimeProducts.products$;
@@ -263,7 +267,20 @@ export class ProductsComponent {
       }
     });
   }
-
-
-
+  calculateStock(productId: string) {
+    const product = this.products.find((p: any) => p.id === productId);
+    if (product) {
+      // Obtener el stock inicial del producto
+      const initialStock = product.stock;
+      
+      // Calcular el total de unidades vendidas para este producto
+      const totalSold = this.ventas
+        .filter((ventas: any) => ventas.productId === productId)
+        .reduce((total: number, ventas: any) => total + ventas.quantity, 0);
+      
+      // Retornar el stock actual (stock inicial - ventas totales)
+      return initialStock - totalSold;
+    }
+    return 0;
+  }
 }

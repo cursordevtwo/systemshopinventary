@@ -55,6 +55,7 @@ ventas: any[] = [];
   private modal: any;
   loading: boolean = true;
   totalIngresos: number = 0;
+  totalStock: number = 0;
 
   constructor(
     public global: GlobalService,
@@ -97,4 +98,7 @@ ventas: any[] = [];
       modal.show();
     }
   }
+  calculateTotalStock(): number {
+    return this.products.reduce((total, product) => total + (product.quantity || 0), 0);
+}
 }
