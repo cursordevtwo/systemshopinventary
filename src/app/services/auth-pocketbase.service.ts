@@ -245,15 +245,6 @@ export class AuthPocketbaseService {
   setToken(token: any): void {
     localStorage.setItem('accessToken', token);
   }
-
-  // getCurrentUser(): UserInterface {
-  //   const user = localStorage.getItem('currentUser');
-  //   return user ? JSON.parse(user) : null; 
-  // }
-  // getUserId(): string {
-  //   const userId = localStorage.getItem('userId');
-  //   return userId ? userId : '';
-  // }
   getCurrentUser(): UserInterface | null {
     if (this.isLocalStorageAvailable()) {
       const user = localStorage.getItem('currentUser');
@@ -311,5 +302,10 @@ export class AuthPocketbaseService {
       this.global.setRoute('home'); // Redirigir a 'home' en caso de error
     });
   }
+
+  getCollection(collection: string) {
+    return this.pb.collection(collection);
+  }
+  
   
 }

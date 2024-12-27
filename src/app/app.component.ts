@@ -16,6 +16,12 @@ import { ProductsComponent } from './components/products/products.component';
 import { EmployeesComponent } from './components/employees/employees.component';
 import { CashComponent } from './components/cash/cash.component';
 import { ContabilidadComponent } from './components/contabilidad/contabilidad.component';
+import { NewCategoryModalComponent } from './components/new-category-modal/new-category-modal.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -34,7 +40,14 @@ import { ContabilidadComponent } from './components/contabilidad/contabilidad.co
     ProductsComponent,
     EmployeesComponent,
     CashComponent,
-    ContabilidadComponent
+    ContabilidadComponent,
+    NewCategoryModalComponent,
+    MatDialogModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatDialogModule,
   ],
  
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

@@ -51,10 +51,10 @@ export class DataApiService {
 	  }
    
   getAllProducts(): Observable<ProductService []> {
-    return this.http.get<ProductService[]>(`${this.baseUrl}/collections/products/records`);
+    return this.http.get<ProductService[]>(`${this.baseUrl}/collections/productsInventory/records`);
   }
   updateProduct(id: string, request: productInterface) {
-    const url_api = this.baseUrl + `/collections/products/records/${id}`;
+    const url_api = this.baseUrl + `/collections/productsInventory/records/${id}`;
 		return this.http.put<productInterface>(url_api, request).pipe(
 		  map(data => data)
 		);
@@ -62,6 +62,19 @@ export class DataApiService {
   deleteSale(saleId: string) {
     const url_api = this.baseUrl + `/collections/ventas/records/${saleId}`;
     return this.http.delete<ventaInterface>(url_api).pipe(
+      map(data => data)
+    );
+  }
+  deleteProduct(productId: string) {
+    const url_api = this.baseUrl + `/collections/productsInventory/records/${productId}`;
+    return this.http.delete<productInterface>(url_api).pipe(
+      map(data => data)
+    );
+  }
+
+  uploadImage(file: File) {
+    const url_api = this.baseUrl + '/collections/files/records';
+    return this.http.post<productInterface>(url_api, file).pipe(
       map(data => data)
     );
   }
