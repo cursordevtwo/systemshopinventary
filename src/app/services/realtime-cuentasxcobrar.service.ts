@@ -5,30 +5,30 @@ import { BehaviorSubject, Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class RealtimeCobranzasService implements OnDestroy {
+export class RealtimeCuentasxcobrarService implements OnDestroy {
   private pb: PocketBase;
-  private cobranzasSubject = new BehaviorSubject<any[]>([]);
+  private cuentasxcobrarSubject = new BehaviorSubject<any[]>([]);
 
   // Esta es la propiedad que expondrá el Observable para que los componentes puedan suscribirse a ella
-  public cobranzas$: Observable<any[]> =
-    this.cobranzasSubject.asObservable();
+  public cuentasxcobrar$: Observable<any[]> =
+    this.cuentasxcobrarSubject.asObservable();
 
   constructor() {
     this.pb = new PocketBase('https://db.buckapi.com:8095');
-    this.subscribeToCobranzas();
+    this.subscribeToCuentasxcobrar();
   }
 
-  private async subscribeToCobranzas() {
+  private async subscribeToCuentasxcobrar() {
     // (Opcional) Autenticación
     await this.pb
       .collection('users')
       .authWithPassword('admin@email.com', 'admin1234');
 
-    this.pb.collection('cobranzas').subscribe('*', (e) => {
+    this.pb.collection('cuentasxcobrar').subscribe('*', (e) => {
       this.handleRealtimeEvent(e);
     });
 
-    this.updateCobranzasList();
+    this.updateCuentasxcobrarList();
   }
 
   private handleRealtimeEvent(event: any) {
@@ -36,20 +36,20 @@ export class RealtimeCobranzasService implements OnDestroy {
     console.log(event.action);
     console.log(event.record);
 
-    this.updateCobranzasList();
+    this.updateCuentasxcobrarList();
   }
 
-  private async updateCobranzasList() {
+    private async updateCuentasxcobrarList() {
     const records = await this.pb
-      .collection('cobranzas')
+      .collection('cuentasxcobrar')
       .getFullList(200 /* cantidad máxima de registros */, {
         sort: '-created', // Ordenar por fecha de creación
       });
-    this.cobranzasSubject.next(records);
+    this.cuentasxcobrarSubject.next(records);
   }
 
   ngOnDestroy() {
     // Desuscribirse cuando el servicio se destruye
-    this.pb.collection('cobranzas').unsubscribe('*');
+    this.pb.collection('cuentasxcobrar').unsubscribe('*');
   }
 }

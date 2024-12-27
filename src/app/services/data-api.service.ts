@@ -78,8 +78,14 @@ export class DataApiService {
       map(data => data)
     );
   }
-  addCobranza(request: cobranzaInterface) {
-    const url_api = this.baseUrl + '/collections/cobranzas/records';
+  addCuentaPorPagar(request: cobranzaInterface) {
+    const url_api = this.baseUrl + '/collections/cuentasxpagar/records';
+		return this.http.post<cobranzaInterface>(url_api, request).pipe(
+		  map(data => data)
+		);
+	  }
+  addCuentaPorCobrar(request: cobranzaInterface) {
+    const url_api = this.baseUrl + '/collections/cuentasxcobrar/records';
 		return this.http.post<cobranzaInterface>(url_api, request).pipe(
 		  map(data => data)
 		);

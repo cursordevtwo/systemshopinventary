@@ -35,18 +35,18 @@
                     <div class="col-xxl-3 col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="mb-2">${{totalGastos | number:'1.2-2'}}</h4>
+                                <h4 class="mb-2">${{totalCuentasPorPagar | number:'1.2-2'}}</h4>
                                 <div class="d-flex align-items-center justify-content-between">
                                     <span class="text-gray-600">Cuentas por pagar</span>
-                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#crearCuentaPagarModal">
-                                        <i class="ph-fill ph-plus"></i>
-                                    </button>
+
                                 </div>
                                 <div class="flex-between gap-8 mt-16">
                                     <span class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-purple-600 text-white text-2xl">
-                                        <i class="ph-fill ph-graduation-cap"></i>
+                                        <i class="ph-fill ph-file-arrow-up"></i>
                                     </span>
-                                    <div id="course-progress" class="remove-tooltip-title rounded-tooltip-value"></div>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#crearCuentaPagarModal">
+                                        <i class="ph-fill ph-plus"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -54,11 +54,14 @@
                     <div class="col-xxl-3 col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="mb-2">${{totalCobranzas | number:'1.2-2'}}</h4>
+                                <h4 class="mb-2">${{totalCuentasPorCobrar | number:'1.2-2'}}</h4>
                                 <span class="text-gray-600">Cuentas por cobrar</span>
                                 <div class="flex-between gap-8 mt-16">
-                                    <span class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-warning-600 text-white text-2xl"><i class="ph-fill ph-users-three"></i></span>
-                                    <div id="community-support" class="remove-tooltip-title rounded-tooltip-value"></div>
+                                    <span class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-warning-600 text-white text-2xl">
+                                        <i class="ph-fill ph-file-arrow-down"></i></span>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#crearCuentaCobrarModal">
+                                        <i class="ph-fill ph-plus"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -523,6 +526,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="crearCuentaPagarModal" tabindex="-1" aria-labelledby="crearCuentaPagarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content radius-16 bg-base">
@@ -594,6 +598,85 @@
                             Cancelar
                         </button>
                         <button type="submit" class="btn bg-primary text-md px-24 py-12 radius-8" [disabled]="!cuentasxpagar.valid">
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="crearCuentaCobrarModal" tabindex="-1" aria-labelledby="crearCuentaCobrarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content radius-16 bg-base">
+            <div class="modal-header py-16 px-24 border border-top-0 border-start-0 border-end-0">
+                <h1 class="modal-title fs-5" id="crearCuentaPagarModalLabel">Nueva Cuenta por Pagar</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-24">
+                <form [formGroup]="cuentasxcobrar" (ngSubmit)="guardarCuentaPorCobrar()">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Cliente *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       formControlName="cliente"
+                                       [ngClass]="{'is-invalid': cuentasxcobrar.get('cliente')?.invalid && cuentasxcobrar.get('cliente')?.touched}">
+                                <div class="invalid-feedback" *ngIf="cuentasxcobrar.get('cliente')?.errors?.['required']">
+                                    El cliente es requerido
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Monto *</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       formControlName="monto"
+                                       [ngClass]="{'is-invalid': cuentasxpagar.get('monto')?.invalid && cuentasxpagar.get('monto')?.touched}">
+                                <div class="invalid-feedback" *ngIf="cuentasxpagar.get('monto')?.errors?.['required']">
+                                    El monto es requerido
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Método de pago *</label>
+                                <select class="form-control" 
+                                        formControlName="metodoPago"
+                                        [ngClass]="{'is-invalid': cuentasxcobrar.get('metodoPago')?.invalid && cuentasxcobrar.get('metodoPago')?.touched}">
+                                    <option value="">Seleccione un método</option>
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="tarjeta">Tarjeta</option>
+                                    <option value="simple pago">Simple pago</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="cuentasxcobrar.get('metodoPago')?.errors?.['required']">
+                                    El método de pago es requerido
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Fecha de vencimiento *</label>
+                                <input type="date" 
+                                       class="form-control" 
+                                       formControlName="fechaVencimiento"
+                                       [ngClass]="{'is-invalid': cuentasxcobrar.get('fechaVencimiento')?.invalid && cuentasxcobrar.get('fechaVencimiento')?.touched}">
+                                <div class="invalid-feedback" *ngIf="cuentasxcobrar.get('fechaVencimiento')?.errors?.['required']">
+                                    La fecha de vencimiento es requerida
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nota</label>
+                                <textarea class="form-control" 
+                                          formControlName="nota"></textarea>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-center gap-8 mt-24">
+                        <button type="button" class="btn bg-danger-600 hover-bg-danger-800 border-danger-600 hover-border-danger-800 text-md px-24 py-12 radius-8" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn bg-primary text-md px-24 py-12 radius-8" [disabled]="!cuentasxcobrar.valid">
                             Guardar
                         </button>
                     </div>
