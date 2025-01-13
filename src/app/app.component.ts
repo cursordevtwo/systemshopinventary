@@ -19,6 +19,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { ScriptService } from './services/script.srvice';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -52,8 +53,32 @@ export class AppComponent {
   title = 'qualitydetailing';
   constructor (
     public global: GlobalService,
-    public auth:AuthPocketbaseService
+    public auth:AuthPocketbaseService,
+    public script: ScriptService
   ){
     this.auth.permision();  
+    this.script.load(
+      'jquery',
+      'bootstrap',
+      'phosphor',
+      'file-upload',
+      'plyr',
+      'dataTables',
+      'full-calendar',
+      'jquery-ui',
+      'editor-quill',
+      'apex-charts',
+      'jquery-jvectormap',
+      'jquery-jvectormap-world',
+      'main',
+    )
+      .then(() => {
+        // console.log('Todos los scripts se cargaron correctamente');
+      })
+      .catch(error => console.log(error));
+      
+  
+    
   }
+  
 }
