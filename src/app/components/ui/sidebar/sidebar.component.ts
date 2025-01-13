@@ -13,7 +13,6 @@ import { AuthPocketbaseService } from '../../../services/auth-pocketbase.service
 })
 export class SidebarComponent {
   userType: string | null = null; // Declarar la propiedad userType
-  isMenuOpen: boolean = false;
 
   constructor (
     public global: GlobalService,
@@ -28,8 +27,5 @@ export class SidebarComponent {
       this.userType = type; // Asignar el tipo de usuario a la propiedad userType
     });
   }
-  toggleMenu() {
-    this.isMenuOpen = !this.isMenuOpen;
-}
   
 }
