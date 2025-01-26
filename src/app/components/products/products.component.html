@@ -98,7 +98,7 @@
               <div class="card border border-gray-100">
                 <div class="card-body p-8">
                   <a class="bg-main-100 rounded-8 overflow-hidden text-center mb-8 h-164 flex-center p-8">
-                    <img src="assets/images/thumbs/course-img1.png" alt="Course Image">
+                    <img src="{{product.file[0]}}" alt="Course Image" *ngIf="product.file.length > 0">
                     <button type="button" (click)="updateProduct(product.id)"
                       class="follow-btn py-2 px-8 flex-align gap-4 text-13 fw-medium text-black border border-black rounded-pill position-absolute inset-block-start-0 inset-inline-end-0 mt-8 me-8 transition-1">
                       <i class="ph ph-pencil d-flex"></i>
@@ -116,8 +116,7 @@
                     <h5 class="mb-0"><a class="hover-text-main-600">{{product.name}}</a></h5>
 
                     <div class="flex-align gap-8 flex-wrap mt-16">
-                      <img src="assets/images/thumbs/user-img1.png" class="w-28 h-28 rounded-circle object-fit-cover"
-                        alt="User Image">
+                    
                       <div>
                           <span class="text-gray-600 text-13"><b> Descripción: </b> <a
                             class="fw-semibold text-gray-400 hover-text-main-400 hover-text-decoration-underline">{{product.description}}</a> </span>
@@ -247,19 +246,11 @@
               <div class="col-12">
                 <label for="imageUpload" class="form-label mb-8 h6">Imagen</label>
                 <div class="flex-align gap-22">
-                  <div class="avatar-upload flex-shrink-0">
-                    <input type="file" id="imageUpload" (change)="onFileChange($event)" accept=".png, .jpg, .jpeg">
-                    <div class="avatar-preview">
-                      <div id="profileImagePreview" [style.background-image]="'url(' + previewImage + ')'"></div>
-                    </div>
-                  </div>
-                  <div
-                    class="avatar-upload-box text-center position-relative flex-grow-1 py-24 px-4 rounded-16 border border-main-300 border-dashed bg-main-50 hover-bg-main-100 hover-border-main-400 transition-2 cursor-pointer">
-                    <label for="imageUpload"
-                      class="position-absolute inset-block-start-0 inset-inline-start-0 w-100 h-100 rounded-16 cursor-pointer z-1"></label>
-                    <span class="text-32 icon text-main-600 d-inline-flex"><i class="ph ph-upload"></i></span>
-                    <span class="text-13 d-block text-gray-400 text my-8">Click para subir o arrastrar y soltar</span>
-                    <span class="text-13 d-block text-main-600">SVG, PNG, JPEG OR GIF (max 1080px1200px)</span>
+              
+                  <div class="text-center position-relative flex-grow-1 py-24 px-4 rounded-16 border border-main-300 border-dashed bg-main-50 hover-bg-main-100 hover-border-main-400 transition-2 cursor-pointer">
+                    <input type="file" (change)="onImageSelect($event)" accept="image/*" />
+                    <img [src]="imagePreview" alt="Imagen previa" class="img-thumbnail" style="max-width: 150px;" *ngIf="imagePreview">
+
                   </div>
                 </div>
               </div>
@@ -283,7 +274,7 @@
         </div>
 
         <div class="card-body">
-          <form [formGroup]="productForm" (ngSubmit)="updateProduct(currentProductId)" #productFormDir="ngForm">
+          <form [formGroup]="productForm" (ngSubmit)="saveupdateProduct(currentProductId)" #productFormDir="ngForm">
             <div class="row gy-4">
               <div class="col-sm-6 col-xs-6">
                 <label for="category" class="form-label mb-8 h6">Categoría</label>
@@ -328,19 +319,11 @@
               <div class="col-12">
                 <label for="imageUpload" class="form-label mb-8 h6">Imagen</label>
                 <div class="flex-align gap-22">
-                  <div class="avatar-upload flex-shrink-0">
-                    <input type="file" id="imageUpload" (change)="onFileChange($event)" accept=".png, .jpg, .jpeg">
-                    <div class="avatar-preview">
-                      <div id="profileImagePreview" [style.background-image]="'url(' + previewImage + ')'"></div>
-                    </div>
-                  </div>
-                  <div
-                    class="avatar-upload-box text-center position-relative flex-grow-1 py-24 px-4 rounded-16 border border-main-300 border-dashed bg-main-50 hover-bg-main-100 hover-border-main-400 transition-2 cursor-pointer">
-                    <label for="imageUpload"
-                      class="position-absolute inset-block-start-0 inset-inline-start-0 w-100 h-100 rounded-16 cursor-pointer z-1"></label>
-                    <span class="text-32 icon text-main-600 d-inline-flex"><i class="ph ph-upload"></i></span>
-                    <span class="text-13 d-block text-gray-400 text my-8">Click para subir o arrastrar y soltar</span>
-                    <span class="text-13 d-block text-main-600">SVG, PNG, JPEG OR GIF (max 1080px1200px)</span>
+                 
+                  <div class="text-center position-relative flex-grow-1 py-24 px-4 rounded-16 border border-main-300 border-dashed bg-main-50 hover-bg-main-100 hover-border-main-400 transition-2 cursor-pointer">
+                    <input type="file" (change)="onImageSelect($event)" accept="image/*" />
+                    <img [src]="imagePreview" alt="Imagen previa" class="img-thumbnail" style="max-width: 150px;" *ngIf="imagePreview">
+
                   </div>
                 </div>
               </div>

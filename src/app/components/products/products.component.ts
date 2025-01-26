@@ -10,6 +10,8 @@ import { RealtimeCategoriasService } from '../../services/realtime-categorias.se
 import { NewCategoryModalComponent } from '../new-category-modal/new-category-modal.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RealtimeVentasService } from '../../services/realtime-ventas.service';
+import { UploadService } from '../../services/upload.service';
+import { from } from 'rxjs';
 
 @Component({
   selector: 'app-products',
@@ -34,6 +36,8 @@ export class ProductsComponent {
   currentProductId: string = '';
   showFilter = false;
   ventas: any[] = [];
+  imagePreview: string | null = null; // Para mostrar la vista previa de la imagen
+  selectedFile: File | null = null;
   constructor(
     public global: GlobalService,
     private fb: FormBuilder,
@@ -42,7 +46,9 @@ export class ProductsComponent {
     public dataApiService: DataApiService,
     public realtimeCategorias: RealtimeCategoriasService,
     private dialog: MatDialog,
-    public realtimeVentas: RealtimeVentasService
+    public realtimeVentas: RealtimeVentasService,
+    public uploadService: UploadService
+
 
   ) {
     this.realtimeProducts.products$;
@@ -55,8 +61,8 @@ export class ProductsComponent {
       unity: [1, [Validators.required, Validators.min(1)]],
       price: [0, [Validators.required, Validators.min(0.01)]],
       code: [123, Validators.required],
-      image: [null],
-      stock: [0, [Validators.required, Validators.min(0)]]
+      stock: [0, [Validators.required, Validators.min(0)]],
+      file: [null]
 
     });
   }
@@ -89,16 +95,6 @@ export class ProductsComponent {
     }
   }
 
-
-  onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      // Store the file in the form and create preview
-      this.productForm.patchValue({ image: file });
-      this.previewImage = URL.createObjectURL(file);
-    }
-  }
-
   addProduct() {
     if (this.productForm.valid) {
       const file = this.productForm.get('image')?.value;
@@ -119,7 +115,7 @@ export class ProductsComponent {
               code: parseInt(this.productForm.get('code')?.value),
               idCategoria: this.productForm.get('idCategoria')?.value,
               collection: 'productsInventory',
-              imageId: fileResponse.id // Add reference to uploaded file
+              file: fileResponse['file']
             };
 
             // Continue with product creation
@@ -145,7 +141,7 @@ export class ProductsComponent {
           idCategoria: this.productForm.get('idCategoria')?.value,
           collection: 'productsInventory',
           stock: parseInt(this.productForm.get('stock')?.value),
-          image: this.productForm.get('image')?.value
+          file: this.productForm.get('file')?.value
         };
 
         this.saveProduct(productData);
@@ -155,10 +151,14 @@ export class ProductsComponent {
     }
   }
 
-  private saveProduct(productData: any) {
-    this.dataApiService.addProduct(productData).subscribe({
-      next: (response) => {
-        console.log('Respuesta exitosa:', response);
+  async saveProduct(productData: any) {
+    if (this.selectedFile) {
+      try {
+        const result = await this.uploadService.createProductRecord(
+          this.selectedFile,
+          productData
+        );
+        console.log('Record created successfully:', result);
         Swal.fire({
           icon: 'success',
           title: 'Éxito',
@@ -166,17 +166,40 @@ export class ProductsComponent {
         });
         this.productForm.reset();
         this.showForm = false;
-        this.realtimeProducts.products$;
-      },
-      error: (error) => {
-        console.error('Error al guardar:', error);
+        this.realtimeProducts.products$ = from(this.uploadService.pb.collection('productsInventory').getFullList());
+        this.selectedFile = null;
+        this.imagePreview = null;
+      } catch (error) {
+        console.error('Error creating record:', error);
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text: 'No se pudo guardar el producto. Por favor, intente nuevamente.'
         });
       }
-    });
+    } else {
+      this.dataApiService.addProduct(productData).subscribe({
+        next: (response) => {
+          console.log('Respuesta exitosa:', response);
+          Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: 'Producto guardado correctamente'
+          });
+          this.productForm.reset();
+          this.showForm = false;
+          this.realtimeProducts.products$ = from(this.uploadService.pb.collection('productsInventory').getFullList());
+        },
+        error: (error) => {
+          console.error('Error al guardar:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo guardar el producto. Por favor, intente nuevamente.'
+          });
+        }
+      });
+    }
   }
 
   updateProduct(productId: string) {
@@ -194,45 +217,113 @@ export class ProductsComponent {
           description: product.description,
           unity: product.unity,
           price: product.price,
-          idCategoria: product.idCategoria
+          idCategoria: product.idCategoria,
+          file: product.file  
         });
 
         if (product.image) {
-          this.previewImage = product.image;
+          this.imagePreview = product.image;
         }
       }
     });
   }
-  private saveUpdatedProduct(productData: any) {
-    this.dataApiService.updateProduct(this.currentProductId, productData).subscribe({
-      next: (response) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Éxito',
-          text: 'Producto actualizado correctamente'
-        });
-        this.productForm.reset();
-        this.showForm = false;
-        this.isEditing = false;
-        this.realtimeProducts.products$;
-      },
-      error: (error) => {
-        console.error('Error al actualizar:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo actualizar el producto. Por favor, intente nuevamente.'
-        });
+  async saveupdateProduct(productData: any) {
+    try {
+      // Crear un FormData para enviar el producto
+      const formData = new FormData();
+      formData.append('name', productData.name);
+      formData.append('price', productData.price);
+      formData.append('code', productData.code);
+      formData.append('unity', productData.unity);
+      formData.append('description', productData.description);
+      formData.append('idCategoria', productData.idCategoria);
+  
+      // Si existe un archivo, lo agregamos al FormData
+      if (productData.file) {
+        formData.append('file', productData.file);
       }
-    });
+  
+      // Intentar actualizar el producto
+      const record = await this.uploadService.pb.collection('productsInventory').update(this.currentProductId, formData);
+  
+      // Actualizar la lista de productos en tiempo real si es necesario
+      // Esto podría ser necesario para mantener la vista sincronizada
+      this.realtimeProducts.products$ = from(this.uploadService.pb.collection('productsInventory').getFullList());
+ 
+      // Mostrar mensaje de éxito
+      Swal.fire({
+        icon: 'success',
+        title: 'Éxito',
+        text: 'Producto actualizado correctamente'
+      });
+  
+      // Actualizar los datos en el formulario para reflejar los cambios
+      this.productForm.patchValue({
+        name: productData.name,
+        price: productData.price,
+        code: productData.code,
+        unity: productData.unity,
+        description: productData.description,
+        idCategoria: productData.idCategoria
+      });
+  
+      // Cerrar el formulario de edición
+      this.productForm.reset();
+      this.showForm = false;
+      this.isEditing = false;
+  
+    } catch (error) {
+      console.error('Error al actualizar:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo actualizar el producto. Por favor, intente nuevamente.'
+      });
+    }
   }
+  
   cancelEdit() {
     this.showForm = false;
     this.isEditing = false;
     this.productForm.reset();
-    this.previewImage = '';
+    this.imagePreview = '';
   }
   deleteProduct(productId: string) {
+    Swal.fire({
+      title: '¿Está seguro?',
+      text: "No podrá revertir esta acción",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.dataApiService.deleteProduct(productId).subscribe({
+          next: async (response) => {
+            console.log('Producto eliminado exitosamente:', response);
+            this.realtimeProducts.products$ = from(this.uploadService.pb.collection('productsInventory').getFullList());
+            this.cancelEdit();
+            Swal.fire(
+              '¡Eliminado!',
+              'El producto ha sido eliminado.',
+              'success'
+            );
+          },
+          error: (error) => {
+            console.error('Error al eliminar:', error);
+            Swal.fire(
+              'Error',
+              'No se pudo eliminar el producto.',
+              'error'
+            );
+          }
+        });
+      }
+    });
+  }
+  /* deleteProduct(productId: string) {
     Swal.fire({
       title: '¿Está seguro?',
       text: "No podrá revertir esta acción",
@@ -266,7 +357,7 @@ export class ProductsComponent {
         });
       }
     });
-  }
+  } */
   calculateStock(productId: string) {
     const product = this.products.find((p: any) => p.id === productId);
     if (product) {
@@ -283,4 +374,60 @@ export class ProductsComponent {
     }
     return 0;
   }
+
+  onImageSelect(event: any) {
+    const input = event.target as HTMLInputElement;
+    if (input?.files?.length) {
+      this.selectedFile = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result; // For preview
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+
+async uploadImageToServer(): Promise<{ url: string }> {
+try {
+  if (!this.selectedFile) {
+    throw new Error('No image selected');
+  }
+
+  const formData = new FormData();
+  formData.append('file', this.selectedFile);
+
+  const response = await this.uploadService.pb.collection('files').create(formData);
+
+  if (response && response['file']) {
+    return { url: this.uploadService.pb.files.getUrl(response, response['file']) };
+  } else {
+    throw new Error('Failed to upload image');
+  }
+} catch (error) {
+  console.error('Error uploading image:', error);
+  throw error;
+}
+}
+
+async uploadImageToServerCorrected(): Promise<{ url: string }> {
+try {
+  if (!this.selectedFile) {
+    throw new Error('No image selected');
+  }
+
+  const formData = new FormData();
+  formData.append('file', this.selectedFile);
+
+  const response = await this.uploadService.pb.collection('files').create(formData);
+
+  if (response && response['file']) {
+    return { url: this.uploadService.pb.files.getUrl(response, response['file']) };
+  } else {
+    throw new Error('Failed to upload image');
+  }
+} catch (error) {
+  console.error('Error uploading image:', error);
+  throw error;
+}
+}
 }

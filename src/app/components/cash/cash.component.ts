@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { AuthPocketbaseService } from '../../services/auth-pocketbase.service';
 import { DataApiService } from '../../services/data-api.service';
 import { RealtimeVentasService } from '../../services/realtime-ventas.service';
+import { Modal } from 'bootstrap';
 export interface VentaInterface {
   customer: string;
   fecha: string;
@@ -24,6 +25,7 @@ export interface VentaInterface {
     subtotal: number;
   }[];
 }
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-cash',
@@ -53,7 +55,6 @@ export class CashComponent {
   currentUser: any = null;
   pb: any;
   authStore: any;
-  showForm: boolean = false;
   productosVenta: {
     idProducto: string;
     nombre: string;
@@ -61,6 +62,14 @@ export class CashComponent {
     precio: number;
     subtotal: number;
   }[] = []; 
+  totalVentasDelDia: number = 0;
+  showForm: boolean = false;
+  showCashClose: boolean = false;
+  selectedSale: any = null;
+  totalStock: number = 0;
+  products: any[] = [];
+
+
   constructor
   (public global: GlobalService,
     public realtimeProducts: RealtimeProductsService,
@@ -189,18 +198,7 @@ export class CashComponent {
       });
     }
   
-   /*  calcularTotal() {
-      // Calcular subtotal
-      this.subtotal = this.productosSeleccionados.reduce((total, producto) => {
-        return total + (producto.price * producto.cantidad);
-      }, 0);
-  
-      // Calcular IVA (16%)
-      this.iva = this.subtotal * 0.16;
-  
-      // Calcular total
-      this.total = this.subtotal + this.iva;
-    } */
+ 
     calcularTotal() {
       this.total = this.productosSeleccionados.reduce((total, producto) => {
           return total + (producto.price * producto.cantidad);
@@ -227,13 +225,6 @@ export class CashComponent {
       hour12: false // Para formato 24 horas
     });
   } 
-  // procesarVenta() {
-  //   console.log('Procesando venta...');
-  //   console.log('Productos seleccionados:', this.productosSeleccionados);
-  //   console.log('Subtotal:', this.subtotal);
-  //   console.log('IVA:', this.iva);
-  //   console.log('Total:', this.total);
-  // }
   procesarVenta() {
     console.log('Procesando venta...');
     console.log('Productos seleccionados:', this.productosSeleccionados);
@@ -262,71 +253,7 @@ export class CashComponent {
     console.log('Total:', this.total);
   }
 
-/* procesarPago() {
-  // Validate payment method
-  if (!this.metodoPago) {
-    Swal.fire({
-      title: 'Error',
-      text: 'Por favor seleccione un método de pago',
-      icon: 'error',
-      confirmButtonText: 'Ok'
-    });
-    return;
-  }
 
-  // Show confirmation dialog
-  Swal.fire({
-    title: '¿Confirmar venta?',
-    text: `Total a pagar: ${this.total.toLocaleString('es-col', { style: 'currency', currency: 'colones' })}`,
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Sí, procesar',
-    cancelButtonText: 'Cancelar'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      const ventaData = {
-        customer: this.customer,
-        total: this.total,
-        unity: this.calculateTotalUnits(),
-        subTotal: this.subtotal.toString(),
-        statusVenta: "completed",
-        descuento: "0",
-        // iva: this.iva.toString(),
-        metodoPago: this.metodoPago,
-        date: new Date().toISOString(),
-        hora: this.horaActual,
-        idProduct: JSON.stringify(this.productosSeleccionados),
-        idUser: "current_user_id" // Replace with actual user ID
-      };
-
-      this.dataApiService.saveVenta(ventaData).subscribe(
-        response => {
-          Swal.fire({
-            title: '¡Venta exitosa!',
-            text: 'La venta ha sido procesada correctamente.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
-          }).then(() => {
-            this.resetearVenta();
-            this.irAPaso(3);
-          });
-        },
-        error => {
-          console.error('Error al guardar la venta', error);
-          Swal.fire({
-            title: 'Error',
-            text: 'Hubo un problema al procesar la venta. Por favor, intente nuevamente.',
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-        }
-      );
-    }
-  });
-} */
 
 private calculateTotalUnits(): number {
   return this.productosSeleccionados.reduce((total, producto) => total + producto.cantidad, 0);
@@ -416,5 +343,38 @@ private resetearVenta() {
       isAuthenticated: !!userId
     };
   }
+
+openCashModal() {
+  this.showForm = true;
+  this.showCashClose = false;
+}
+
+openCashCloseModal() {
+  this.showForm = false;
+  this.showCashClose = true;
+  this.calcularTotalVentasDelDia(); // Llama a la función para calcular el total de ventas
+}
+
+calcularTotalVentasDelDia() {
+  this.totalVentasDelDia = this.productosSeleccionados.reduce((total, producto) => {
+    return total + (producto.price * producto.cantidad);
+  }, 0);
+}
+volverAOpciones() {
+  this.showForm = false;
+  this.showCashClose = false;
+}
+
+openSaleDetailsModal(venta: any) {
+  this.selectedSale = venta;
+  const modalElement = document.getElementById('saleDetailsModal');
+  if (modalElement) {
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  }
+}
+calculateTotalStock(): number {
+  return this.products.reduce((total, product) => total + (product.quantity || 0), 0);
+}
 
 }
