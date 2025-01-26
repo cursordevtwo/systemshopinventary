@@ -68,7 +68,8 @@ export class CashComponent {
   selectedSale: any = null;
   totalStock: number = 0;
   products: any[] = [];
-
+  ventas: any[] = [];
+  
 
   constructor
   (public global: GlobalService,
@@ -78,6 +79,7 @@ export class CashComponent {
     public realtimeVentas: RealtimeVentasService,
     
   ) 
+  
   {
     this.fechaActual = new Date().toLocaleDateString();
     this.horaActual = new Date().toLocaleTimeString();
@@ -95,6 +97,13 @@ export class CashComponent {
       this.productos = products;
       this.productosFiltrados = [...products]; // Inicialmente muestra todos los productos
       console.log('Productos cargados:', this.productos); // Para debugging
+    });
+
+    this.realtimeVentas.ventas$.subscribe(ventas => {
+      this.ventas = ventas;
+      if (ventas) {
+        this.totalVentasDelDia = ventas.reduce((total, venta) => total + (venta.total || 0), 0);
+      }
     });
   }
   deleteSale(saleId: string) {

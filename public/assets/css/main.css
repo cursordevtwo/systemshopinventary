@@ -40,16 +40,34 @@
     --heading-five: clamp(1rem, 1.2rem + 0.722vw, 1.125rem);
     --heading-six: 0.9375rem;
   /* Font Size End */
-  /* template main color */
+  /* 
     --main-h: 219;
     --main-s: 94%;
     --main-l: 61%;
     --main: var(--main-h) var(--main-s) var(--main-l);
-  /* template main color */
+ 
     --main-two-h: 166;
     --main-two-s: 68%;
     --main-two-l: 48%;
-    --main-two: var(--main-two-h) var(--main-two-s) var(--main-two-l);
+    --main-two: var(--main-two-h) var(--main-two-s) var(--main-two-l); */
+    /* template main color (Rosado Pastel) */
+--main-h: 340; /* Tono de rosa */
+--main-s: 60%;  /* Baja saturación para un tono pastel */
+--main-l: 85%;  /* Alta luminosidad para un color suave */
+--main: var(--main-h) var(--main-s) var(--main-l);
+
+/* template secondary color (Morado Pastel) */
+--main-two-h: 270; /* Tono de morado */
+--main-two-s: 40%;  /* Baja saturación para suavizarlo */
+--main-two-l: 80%;  /* Alta luminosidad para un color suave */
+--main-two: var(--main-two-h) var(--main-two-s) var(--main-two-l);
+
+/* template tertiary color (Dorado Pastel) */
+--main-three-h: 45;  /* Tono de dorado */
+--main-three-s: 60%; /* Saturación media para dorado pastel */
+--main-three-l: 75%; /* Luminosidad alta para un tono suave */
+--main-three: var(--main-three-h) var(--main-three-s) var(--main-three-l);
+
   /* White Color */
     --white: 0 0% 100%;
     --black: 220 33% 9%;
@@ -249,7 +267,7 @@
     border: 1px solid transparent;
     font-weight: 500;
     font-family: var(--body-font);
-    color: hsl(var(--white)) !important;
+    color: hsl(var(--black)) !important;
     z-index: 1;
     line-height: 1;
     padding: 14px 20px;
