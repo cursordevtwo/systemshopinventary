@@ -95,7 +95,7 @@
                                                         <td>{{venta.date | date:'short'}}</td>  
                                                          <td>{{venta.customer}}</td>
                                                          <td>{{venta.idProduct && venta.idProduct.length > 0 ? venta.idProduct[0].name : ''}}</td>                                                     
-                                                         <td>${{venta.total | number:'1.2-2'}}</td>                                      
+                                                         <td>₡ {{venta.total | number:'1.2-2'}}</td>                                      
                                                         <td>
                                                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#openSaleDetailsModal" (click)="openSaleDetailsModal(venta)">Ver</button>
                                                         </td>
@@ -124,7 +124,7 @@
                     
                     <div class="d-flex justify-content-between mb-2">
                       <span>Total de Ventas del Día:</span>
-                      <strong>{{totalVentasDelDia | currency}}</strong>
+                      <strong>₡ {{totalVentasDelDia | number:'1.2-2'}}</strong>
                     </div>
                   </div>
                 </div>
@@ -223,8 +223,8 @@
                                                 <input type="number" [(ngModel)]="producto.cantidad"
                                                     (change)="calcularTotal()" min="1" class="form-control w-75">
                                             </td>
-                                            <td>{{producto.price | currency}}</td>
-                                            <td>{{producto.price * producto.cantidad | currency}}</td>
+                                            <td>₡ {{producto.price | number:'1.2-2'}}</td>
+                                            <td>₡ {{producto.price * producto.cantidad | number:'1.2-2'}}</td>
                                             <td>
                                                 <button class="btn btn-danger btn-sm"
                                                     (click)="eliminarProducto(producto)">
@@ -269,7 +269,7 @@
                                                 <input type="number" [(ngModel)]="producto.cantidad"
                                                     (change)="calcularTotal()" min="1" class="form-control w-75">
                                             </td>
-                                            <td>{{producto.price | currency}}</td>
+                                            <td>₡ {{producto.price | number:'1.2-2'}}</td>
                                             <!-- <td>{{producto.price * producto.cantidad | currency}}</td> -->
                                             <td>
                                                 <button class="btn btn-danger btn-sm"
@@ -397,8 +397,8 @@
                                                 <tr *ngFor="let producto of productosSeleccionados">
                                                     <td>{{producto.name}}</td>
                                                     <td>{{producto.cantidad}}</td>
-                                                    <td>{{producto.price | currency}}</td>
-                                                    <td>{{producto.price * producto.cantidad | currency}}</td>
+                                                    <td>₡ {{producto.price | number:'1.2-2'}}</td>
+                                                    <td>₡ {{producto.price * producto.cantidad | number:'1.2-2'}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -406,7 +406,7 @@
                                         <div class="totales mt-3">
                                             <div class="d-flex justify-content-between mb-2">
                                                 <span>Total:</span>
-                                                <strong>{{total | currency}}</strong>
+                                                <strong>₡ {{total | number:'1.2-2'}}</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -435,7 +435,7 @@
                             <p><strong>Empleado:</strong> {{selectedSale.Iduser?.name || 'No especificado'}}</p>
                         </div>
                         <div class="col-md-6 text-end">
-                            <p><strong>Total:</strong> ${{selectedSale.total | number:'1.2-2'}}</p>
+                            <p><strong>Total:</strong> ₡ {{selectedSale.total | number:'1.2-2'}}</p>
                         </div>
                     </div>
     
@@ -462,8 +462,8 @@
                                 <tr *ngFor="let product of selectedSale.idProduct">
                                     <td>{{product.name}}</td>
                                     <td>{{selectedSale.unity}}</td>
-                                    <td>${{product.price | number:'1.2-2'}}</td>
-                                    <td>${{selectedSale.total | number:'1.2-2'}}</td>
+                                    <td>₡ {{product.price | number:'1.2-2'}}</td>
+                                    <td>₡ {{selectedSale.total | number:'1.2-2'}}</td>
                                 </tr>
                             </tbody>
                         </table>

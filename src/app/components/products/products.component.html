@@ -65,16 +65,17 @@
       <div class="card mt-24">
         <div class="card-body">
           <div class="mb-20 flex-between flex-wrap gap-8" [hidden]="showForm">
-<!--             <h4 class="mb-0">Productos</h4>
- -->            <div class="flex-align gap-8 flex-wrap">
-              <div class="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ps-8 focus-border-main-600">
-                <span class="text-lg"><i class="ph ph-layout"></i></span>
-                <select class="form-control px-8 py-12 border-0 text-inherit rounded-4 text-center">
-                  <option value="1" selected disabled>Categorías</option>
-                  <option *ngFor="let category of (realtimeCategorias.categorias$ | async)" [value]="category.id">
-                    {{category.name}}
-                  </option>
-                </select>
+            <h4 class="mb-0">Filtros de búsqueda</h4>
+            <div class="flex-align gap-8 flex-wrap">
+                <div class="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ps-8 focus-border-main-600">
+                  <span class="text-lg"><i class="ph ph-layout"></i></span>
+                  <select class="form-control px-8 py-12 border-0 text-inherit rounded-4 text-center">
+                      <option value="0" selected>Ver todas</option> <!-- Opción para ver todas -->
+                      <option value="1" disabled>Categorías</option>
+                      <option *ngFor="let category of (realtimeCategorias.categorias$ | async)" [value]="category.id">
+                          {{category.name}}
+                      </option>
+                  </select>
               </div>
               <div class="position-relative text-gray-500 flex-align gap-4 text-13">
                 <span class="text-inherit">Ordenar por: </span>
@@ -130,7 +131,7 @@
                       </div>
                       <div class="flex-align gap-4">
                         <span class="text-sm text-main-600 d-flex"><i class="ph ph-money"></i></span>
-                        <span class="text-13 text-gray-600"><b>Precio:</b> {{product.price}}</span>
+                        <span class="text-13 text-gray-600"><b>Precio:</b> ₡ {{product.price}}</span>
                       </div>
                     </div>
 

@@ -11,7 +11,7 @@
                     <div class="col-xxl-3 col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="mb-2">${{totalCajaChica | number:'1.2-2'}}</h4>
+                                <h4 class="mb-2">₡{{totalCajaChica | number:'1.2-2'}}</h4>
                                 <span class="text-gray-600">Caja Chica</span>
                                 <div class="flex-between gap-8 mt-16">
                                     <span class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-600 text-white text-2xl"><i class="ph-fill ph-book-open"></i></span>
@@ -23,7 +23,7 @@
                     <div class="col-xxl-3 col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="mb-2">${{totalVentas | number:'1.2-2'}}</h4>
+                                <h4 class="mb-2">₡ {{totalVentas | number:'1.2-2'}}</h4>
                                 <span class="text-gray-600" (click)="global.setRoute('historial-ventas')">Ingresos por ventas</span>
                                 <div class="flex-between gap-8 mt-16">
                                     <span class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-two-600 text-white text-2xl"><i class="ph-fill ph-money"></i> </span>
@@ -35,7 +35,7 @@
                     <div class="col-xxl-3 col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="mb-2">${{totalCuentasPorPagar | number:'1.2-2'}}</h4>
+                                <h4 class="mb-2">₡ {{totalCuentasPorPagar | number:'1.2-2'}}</h4>
                                 <div class="d-flex align-items-center justify-content-between">
                                     <span class="text-gray-600">Cuentas por pagar</span>
 
@@ -54,7 +54,7 @@
                     <div class="col-xxl-3 col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="mb-2">${{totalCuentasPorCobrar | number:'1.2-2'}}</h4>
+                                <h4 class="mb-2">₡ {{totalCuentasPorCobrar | number:'1.2-2'}}</h4>
                                 <span class="text-gray-600">Cuentas por cobrar</span>
                                 <div class="flex-between gap-8 mt-16">
                                     <span class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-warning-600 text-white text-2xl">
@@ -139,13 +139,13 @@
                                             </td>
                                             <td>
                                                 <span class="h6 mb-0 fw-medium text-danger-600" *ngIf="operacion.tipo === 'pagar'">
-                                                    ${{operacion.monto | number:'1.2-2'}}
+                                                    ₡{{operacion.monto | number:'1.2-2'}}
                                                 </span>
                                                 <span *ngIf="operacion.tipo !== 'pagar'">-</span>
                                             </td>
                                             <td>
                                                 <span class="h6 mb-0 fw-medium text-success-600" *ngIf="operacion.tipo === 'cobrar'">
-                                                    ${{operacion.monto | number:'1.2-2'}}
+                                                    ₡{{operacion.monto | number:'1.2-2'}}
                                                 </span>
                                                 <span *ngIf="operacion.tipo !== 'cobrar'">-</span>
                                             </td>
