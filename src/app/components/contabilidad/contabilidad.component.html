@@ -44,6 +44,9 @@
                                     <span class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-purple-600 text-white text-2xl">
                                         <i class="ph-fill ph-file-arrow-up"></i>
                                     </span>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#listadoCuentasPorPagar">
+                                        <i class="ph-fill ph-list"></i>
+                                    </button>
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#crearCuentaPagarModal">
                                         <i class="ph-fill ph-plus"></i>
                                     </button>
@@ -59,6 +62,9 @@
                                 <div class="flex-between gap-8 mt-16">
                                     <span class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-warning-600 text-white text-2xl">
                                         <i class="ph-fill ph-file-arrow-down"></i></span>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#listadoCuentasPorCobrar">
+                                        <i class="ph-fill ph-list"></i>
+                                    </button>
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#crearCuentaCobrarModal">
                                         <i class="ph-fill ph-plus"></i>
                                     </button>
@@ -283,6 +289,40 @@
             </div>
         </div>
     </div>
+</div> 
+<div class="modal fade" id="listadoCuentasPorPagar" tabindex="-1" aria-labelledby="listadoCuentasPorPagarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content radius-16 bg-base">
+            <div class="modal-header py-16 px-24 border border-top-0 border-start-0 border-end-0">
+                <h1 class="modal-title fs-5" id="listadoCuentasPorPagarLabel">Listado de Cuentas por Pagar</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-24">
+                <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Proveedor</th>
+                        <th>Monto</th>
+                        <th>Método de Pago</th>
+                        <th>Fecha de Vencimiento</th>
+                        <th>Nota</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let cuentasxpagar of (realtimeCuentasxpagar.cuentasxpagar$ | async)">
+                            <tr>
+                                <td style="color: black;">{{ cuentasxpagar.proveedor }}</td>
+                                <td style="color: black;">{{ cuentasxpagar.monto }}</td>
+                                <td style="color: black;">{{ cuentasxpagar.metodoPago }}</td>
+                                <td style="color: black;">{{ cuentasxpagar.fechaVencimiento }}</td>
+                                <td style="color: black;">{{ cuentasxpagar.nota }}</td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="modal fade" id="crearCuentaCobrarModal" tabindex="-1" aria-labelledby="crearCuentaCobrarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -359,6 +399,40 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="listadoCuentasPorCobrar" tabindex="-1" aria-labelledby="listadoCuentasPorCobrarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content radius-16 bg-base">
+            <div class="modal-header py-16 px-24 border border-top-0 border-start-0 border-end-0">
+                <h1 class="modal-title fs-5" id="listadoCuentasPorCobrarLabel">Listado de Cuentas por Cobrar</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-24">
+                <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Cliente</th>
+                        <th>Monto</th>
+                        <th>Método de Pago</th>
+                        <th>Fecha de Vencimiento</th>
+                        <th>Nota</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let cuentasxcobrar of (realtimeCuentasxcobrar.cuentasxcobrar$ | async)">
+                            <tr>
+                                <td style="color: black;">{{ cuentasxcobrar.cliente }}</td>
+                                <td style="color: black;">{{ cuentasxcobrar.monto }}</td>
+                                <td style="color: black;">{{ cuentasxcobrar.metodoPago }}</td>
+                                <td style="color: black;">{{ cuentasxcobrar.fechaVencimiento }}</td>
+                                <td style="color: black;">{{ cuentasxcobrar.nota }}</td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                  </table>
             </div>
         </div>
     </div>

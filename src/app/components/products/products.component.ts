@@ -38,6 +38,12 @@ export class ProductsComponent {
   ventas: any[] = [];
   imagePreview: string | null = null; // Para mostrar la vista previa de la imagen
   selectedFile: File | null = null;
+  selectedCategory: string = ''; // Default category
+  searchQuery: string = ''; // Default search query
+  productosFiltrados: any[] = [];
+  productos$: any;
+  searchTerm: string = '';
+
   constructor(
     public global: GlobalService,
     private fb: FormBuilder,
@@ -66,6 +72,20 @@ export class ProductsComponent {
 
     });
   }
+  ngOnInit() {
+    this.loadProducts();
+    this.global.applyFilters(this.selectedCategory, this.searchQuery); // Initial call to set up default view
+}
+  loadProducts() {
+    this.realtimeProducts.products$.subscribe((products: any[]) => {
+      // Load products if needed
+    });
+  }
+  onFilterChange() {
+    this.global.applyFilters(this.selectedCategory, this.searchQuery);
+  }
+  
+  
   openNewCategoryModal() {
     const dialogRef = this.dialog.open(NewCategoryModalComponent, {
       width: '600px',
