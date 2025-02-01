@@ -9,6 +9,10 @@ import { AuthPocketbaseService } from '../../services/auth-pocketbase.service';
 import { DataApiService } from '../../services/data-api.service';
 import { RealtimeVentasService } from '../../services/realtime-ventas.service';
 import { Modal } from 'bootstrap';
+import { UploadService } from '../../services/upload.service';
+import { from } from 'rxjs';
+
+
 export interface VentaInterface {
   customer: string;
   fecha: string;
@@ -77,6 +81,7 @@ export class CashComponent {
     public authPocketbase: AuthPocketbaseService,
     public dataApiService: DataApiService,
     public realtimeVentas: RealtimeVentasService,
+    public uploadService: UploadService
     
   ) 
   
@@ -207,12 +212,105 @@ export class CashComponent {
       });
     }
   
- 
     calcularTotal() {
+      this.total = this.productosSeleccionados.reduce((total, producto) => {
+        return total + (producto.price * producto.cantidad);
+      }, 0);
+    }
+  
+    agregarProducto(producto: any) {
+      // Check if product is already in selected products
+      const existingProductIndex = this.productosSeleccionados.findIndex(p => p.id === producto.id);
+  
+      if (existingProductIndex !== -1) {
+        // Product already exists, check stock before incrementing
+        const currentStock = producto.stock || 0;
+        const currentQuantity = this.productosSeleccionados[existingProductIndex].cantidad;
+  
+        if (currentQuantity + 1 <= currentStock) {
+          this.productosSeleccionados[existingProductIndex].cantidad++;
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Stock Insuficiente',
+            text: `Solo quedan ${currentStock} unidades de ${producto.name} en stock.`
+          });
+        }
+      } else {
+        // New product, check stock before adding
+        if (producto.stock && producto.stock > 0) {
+          this.productosSeleccionados.push({
+            ...producto,
+            cantidad: 1
+          });
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Stock Agotado',
+            text: `El producto ${producto.name} no tiene stock disponible.`
+          });
+        }
+      }
+  
+      this.calcularTotal();
+    }
+  
+    procesarPago() {
+      // Validate stock before processing payment
+      const insufficientStockProducts = this.productosSeleccionados.filter(producto => 
+        producto.cantidad > (producto.stock || 0)
+      );
+  
+      if (insufficientStockProducts.length > 0) {
+        const productNames = insufficientStockProducts.map(p => p.name).join(', ');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Stock Insuficiente',
+          text: `Los siguientes productos no tienen suficiente stock: ${productNames}`
+        });
+        return;
+      }
+  
+      // Proceed with payment and update stock
+      this.productosSeleccionados.forEach(async (producto) => {
+        try {
+          // Update stock in the database
+          const updatedProduct = await this.dataApiService.updateProductStock(
+            producto.id, 
+            producto.stock - producto.cantidad
+          ).toPromise();
+  
+          // Optionally, refresh product list or update local state
+          this.realtimeProducts.products$ = from(this.uploadService.pb.collection('productsInventory').getFullList());
+        } catch (error) {
+          console.error('Error updating product stock:', error);
+        }
+      });
+  
+      // Rest of your payment processing logic
+      // ...
+    }
+  
+    // Modify cantidad input to validate stock
+    onCantidadChange(producto: any) {
+      const currentStock = producto.stock || 0;
+      
+      if (producto.cantidad > currentStock) {
+        producto.cantidad = currentStock;
+        Swal.fire({
+          icon: 'warning',
+          title: 'Stock Insuficiente',
+          text: `Solo quedan ${currentStock} unidades de ${producto.name} en stock.`
+        });
+      }
+  
+      this.calcularTotal();
+    }
+   /*  calcularTotal() {
       this.total = this.productosSeleccionados.reduce((total, producto) => {
           return total + (producto.price * producto.cantidad);
       }, 0);
-  }
+  } */
     // Funciones para navegar entre pasos
     irAPaso(paso: number) {
       this.pasoActual = paso;
@@ -267,7 +365,7 @@ export class CashComponent {
 private calculateTotalUnits(): number {
   return this.productosSeleccionados.reduce((total, producto) => total + producto.cantidad, 0);
 }
-procesarPago() {
+/* procesarPago() {
   if (!this.metodoPago || !this.customer) {
     Swal.fire({
       title: 'Error',
@@ -332,7 +430,7 @@ procesarPago() {
       );
     }
   });
-}
+} */
   
 private resetearVenta() {
   this.productosSeleccionados = [];

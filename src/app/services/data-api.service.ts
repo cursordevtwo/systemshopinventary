@@ -52,6 +52,14 @@ export class DataApiService {
 		  map(data => data)
 		);
 	  }
+    updateProductStock(productId: string, newStock: number) {
+      const url_api = `${this.baseUrl}/collections/productsInventory/records/${productId}`;
+      const request = { stock: newStock };
+      
+      return this.http.patch<any>(url_api, request).pipe(
+        map(data => data)
+      );
+    }
   deleteSale(saleId: string) {
     const url_api = this.baseUrl + `/collections/ventas/records/${saleId}`;
     return this.http.delete<ventaInterface>(url_api).pipe(

@@ -68,7 +68,9 @@ export class ProductsComponent {
       price: [0, [Validators.required, Validators.min(0.01)]],
       code: [123, Validators.required],
       stock: [0, [Validators.required, Validators.min(0)]],
-      file: [null]
+      file: [null],
+      color: ['', Validators.required],
+      codeBarra: [123, Validators.required]
 
     });
   }
@@ -110,12 +112,14 @@ export class ProductsComponent {
           unity: 1,
           price: 0,
           code: 123,
-          stock: 0
+          stock: 0,
+          color: '',
+          codeBarra: 123
         });
     }
   }
 
-  addProduct() {
+ /*  addProduct() {
     if (this.productForm.valid) {
       const file = this.productForm.get('image')?.value;
 
@@ -134,6 +138,7 @@ export class ProductsComponent {
               price: parseFloat(this.productForm.get('price')?.value),
               code: parseInt(this.productForm.get('code')?.value),
               idCategoria: this.productForm.get('idCategoria')?.value,
+              color: this.productForm.get('color')?.value,
               collection: 'productsInventory',
               file: fileResponse['file']
             };
@@ -161,7 +166,8 @@ export class ProductsComponent {
           idCategoria: this.productForm.get('idCategoria')?.value,
           collection: 'productsInventory',
           stock: parseInt(this.productForm.get('stock')?.value),
-          file: this.productForm.get('file')?.value
+          file: this.productForm.get('file')?.value,
+          color: this.productForm.get('color')?.value
         };
 
         this.saveProduct(productData);
@@ -169,9 +175,72 @@ export class ProductsComponent {
     } else {
       console.log('Formulario inválido');
     }
-  }
+  } */
 
-  async saveProduct(productData: any) {
+    addProduct() {
+      if (this.productForm.valid) {
+        const file = this.productForm.get('image')?.value;
+        const initialStock = parseInt(this.productForm.get('unity')?.value);
+  
+        // First upload the image if it exists
+        if (file) {
+          const formData = new FormData();
+          formData.append('file', file);
+  
+          this.dataApiService.uploadImage(file).subscribe({
+            next: (fileResponse: any) => {
+              // Create product with file reference
+              const productData = {
+                name: this.productForm.get('name')?.value,
+                description: this.productForm.get('description')?.value,
+                unity: initialStock,
+                price: parseFloat(this.productForm.get('price')?.value),
+                code: parseInt(this.productForm.get('code')?.value),
+                idCategoria: this.productForm.get('idCategoria')?.value,
+                color: this.productForm.get('color')?.value,
+                collection: 'productsInventory',
+                file: fileResponse['file'],
+                stock: initialStock,
+                initialStock: initialStock,
+                codeBarra: this.productForm.get('codeBarra')?.value
+              };
+  
+              // Continue with product creation
+              this.saveProduct(productData);
+            },
+            error: (error) => {
+              console.error('Error uploading file:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al subir la imagen. Por favor, intente nuevamente.'
+              });
+            }
+          });
+        } else {
+          // If no image, create product without image reference
+          const productData = {
+            name: this.productForm.get('name')?.value,
+            description: this.productForm.get('description')?.value,
+            unity: initialStock,
+            price: parseFloat(this.productForm.get('price')?.value),
+            code: parseInt(this.productForm.get('code')?.value),
+            idCategoria: this.productForm.get('idCategoria')?.value,
+            collection: 'productsInventory',
+            stock: initialStock,
+            initialStock: initialStock,
+            file: this.productForm.get('file')?.value,
+            color: this.productForm.get('color')?.value,
+            codeBarra: this.productForm.get('codeBarra')?.value
+          };
+  
+          this.saveProduct(productData);
+        }
+      } else {
+        console.log('Formulario inválido');
+      }
+    }
+    async saveProduct(productData: any) {
     if (this.selectedFile) {
       try {
         const result = await this.uploadService.createProductRecord(
@@ -238,7 +307,10 @@ export class ProductsComponent {
           unity: product.unity,
           price: product.price,
           idCategoria: product.idCategoria,
-          file: product.file  
+          stock: product.stock,
+          color: product.color,
+          file: product.file,
+          codeBarra: product.codeBarra
         });
 
         if (product.image) {
@@ -257,6 +329,9 @@ export class ProductsComponent {
       formData.append('unity', productData.unity);
       formData.append('description', productData.description);
       formData.append('idCategoria', productData.idCategoria);
+      formData.append('stock', productData.stock);
+      formData.append('color', productData.color);
+      formData.append('codeBarra', productData.codeBarra);
   
       // Si existe un archivo, lo agregamos al FormData
       if (productData.file) {
@@ -284,7 +359,10 @@ export class ProductsComponent {
         code: productData.code,
         unity: productData.unity,
         description: productData.description,
-        idCategoria: productData.idCategoria
+        idCategoria: productData.idCategoria,
+        stock: productData.stock,
+        color: productData.color,
+        codeBarra: productData.codeBarra
       });
   
       // Cerrar el formulario de edición
