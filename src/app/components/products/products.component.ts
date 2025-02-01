@@ -124,21 +124,21 @@ export class ProductsComponent {
   } */
 
     showNewProduct() {
-      this.showForm = !this.showForm;
-      if (this.showForm) {
-        this.isEditing = false;
-        this.productForm.reset();
-        this.previewImage = 'assets/images/thumbs/setting-profile-img.jpg';
-        // Set default values if needed
-        this.productForm.patchValue({
-          unity: 1,
-          price: 0,
-          code: 123,
-          stock: 0,
-          color: '', // Reiniciar el campo "color"
-        });
-      }
-    }
+  this.showForm = !this.showForm;
+  if (this.showForm) {
+    this.isEditing = false;
+    this.productForm.reset();
+    this.previewImage = 'assets/images/thumbs/setting-profile-img.jpg';
+    // Set default values if needed
+    this.productForm.patchValue({
+      unity: 1,
+      price: 0,
+      code: 123,
+      stock: 0,
+      color: '', // Reiniciar el campo "color"
+    });
+  }
+}
  
     addProduct() {
       if (this.productForm.valid) {

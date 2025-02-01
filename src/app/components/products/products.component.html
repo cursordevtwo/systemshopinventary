@@ -67,9 +67,14 @@
           <div class="row g-20" [hidden]="showForm">
             <div class="col-xxl-3 col-lg-4 col-sm-6" *ngFor="let product of (realtimeProducts.products$ | async)">
               <div class="card border border-gray-100">
+                <!-- Mostrar el código de barras -->
+                <div class="flex-between gap-4 flex-wrap mt-24" *ngIf="product.codeBarra">
+                  <img [src]="product.codeBarra" alt="Código de Barras" class="imgbarcodeImage">
+                </div>
+            
                 <div class="card-body p-8">
                   <a class="bg-main-100 rounded-8 overflow-hidden text-center mb-8 h-164 flex-center p-8">
-                    <img src="{{product.file[0]}}" alt="Course Image" *ngIf="product.file.length > 0">
+                    <img [src]="product.file[0]" alt="Course Image" *ngIf="product.file?.length > 0">
                     <button type="button" (click)="updateProduct(product.id)"
                       class="follow-btn py-2 px-8 flex-align gap-4 text-13 fw-medium text-black border border-black rounded-pill position-absolute inset-block-start-0 inset-inline-end-0 mt-8 me-8 transition-1">
                       <i class="ph ph-pencil d-flex"></i>
@@ -82,18 +87,16 @@
                     </button>
                   </a>
                   <div class="p-8">
-                    <span
-                      class="text-13 py-2 px-10 rounded-pill bg-success-50 text-success-600 mb-16">{{product.idCategoria.name}}</span>
+                    <span class="text-13 py-2 px-10 rounded-pill bg-success-50 text-success-600 mb-16">{{product.idCategoria.name}}</span>
                     <h5 class="mb-0"><a class="hover-text-main-600">{{product.name}}</a></h5>
-
+            
                     <div class="flex-align gap-8 flex-wrap mt-16">
-                    
                       <div>
-                          <span class="text-gray-600 text-13"><b> Descripción: </b> <a
-                            class="fw-semibold text-gray-400 hover-text-main-400 hover-text-decoration-underline">{{product.description}}</a> </span>
+                        <span class="text-gray-600 text-13"><b> Descripción: </b> <a
+                          class="fw-semibold text-gray-400 hover-text-main-400 hover-text-decoration-underline">{{product.description}}</a> </span>
                       </div>
                     </div>
-
+            
                     <div class="flex-align gap-8 mt-12 pt-12 border-top border-gray-100">
                       <div class="flex-align gap-4">
                         <span class="text-sm text-main-600 d-flex"><i class="ph ph-tag"></i></span>
@@ -104,16 +107,13 @@
                         <span class="text-13 text-gray-600"><b>Precio:</b> ₡ {{product.price}}</span>
                       </div>
                     </div>
-
+            
                     <div class="flex-between gap-4 flex-wrap mt-24">
                       <div class="flex-align gap-4">
                         <span class="text-15 fw-bold text-warning-600 d-flex"><i class="ph-fill ph-code"></i></span>
                         <span class="text-13 fw-bold text-gray-600">Codigo: {{product.code}}</span>
                       </div>
                       <span class="text-13 fw-bold text-gray-600">Stock: {{product.stock}}</span>
-                    </div>
-                    <div class="flex-between gap-4 flex-wrap mt-24">
-                      <img [src]="product.codeBar" *ngIf="product.codeBar" alt="Código de Barras">
                     </div>
                   </div>
                 </div>
