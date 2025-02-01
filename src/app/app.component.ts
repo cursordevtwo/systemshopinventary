@@ -20,6 +20,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { ScriptService } from './services/script.srvice';
+import { BarcodeComponent } from './components/barcode/barcode.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -43,6 +44,7 @@ import { ScriptService } from './services/script.srvice';
     MatInputModule,
     MatButtonModule,
     MatDialogModule,
+    BarcodeComponent
   ],
  
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

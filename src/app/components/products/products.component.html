@@ -19,49 +19,7 @@
         </button>
       </div>
 
-      <!-- Tarjetas de productos --><!-- 
-      <div class="row g-20 pt-24" [hidden]="showForm">
-        <div class="col-xl-3 col-md-4 col-sm-6" *ngFor="let product of (realtimeProducts.products$ | async)">
-          <div class="mentor-card rounded-8 overflow-hidden">
-            <div class="mentor-card__cover position-relative">
-              <img src="assets/images/thumbs/mentor-cover-img1.png" alt="" class="cover-img">
-              <button type="button" (click)="updateProduct(product.id)"
-                class="follow-btn py-2 px-8 flex-align gap-4 text-13 fw-medium text-white border border-white rounded-pill position-absolute inset-block-start-0 inset-inline-end-0 mt-8 me-8 transition-1">
-                <i class="ph ph-pencil d-flex"></i>
-                <span class="text">Editar</span>
-              </button>
-              <button type="button"
-                class="follow-btn py-2 px-8 flex-align gap-4 text-13 fw-medium text-white border border-white rounded-pill position-absolute inset-block-start-0 inset-inline-end-0 mt-48 me-8 transition-1">
-                <i class="ph ph-trash d-flex"></i>
-                <span class="text" (click)="deleteProduct(product.id)">Eliminar</span>
-              </button>
-
-            </div>
-            <div class="mentor-card__content text-center">
-
-
-              <h2 class="mb-0" style="font-size: 18px; padding-top: 20px;">
-                <a> {{ product.name }}</a>
-              </h2>
-              <p class="mt-20 text-gray-600 text-14 text-line-2"><i class="ph-fill ph-money"
-                  style="text-align: left;"></i> Precio: {{ product.price }}</p>
-              <p class="mt-20 text-gray-600 text-14 text-line-2"><i class="ph-fill ph-check"
-                  style="text-align: left;"></i>Descripcion: {{ product.description }}</p>
-              <div class="mentor-card__rating mt-20 border border-gray-100 px-8 py-6 rounded-8 flex-between flex-wrap">
-                <div class="flex-align gap-4">
-                  <span class="text-15 fw-normal text-main-600 d-flex"><i class="ph-fill ph-bookmarks"></i></span>
-                  <span class="text-13 fw-normal text-gray-600">Unidades: {{ product.unity }} </span>
-                </div>
-
-                <div class="flex-align gap-4">
-                  <span class="text-15 fw-normal text-main-600 d-flex"><i class="ph-fill ph-code"></i></span>
-                  <span class="text-13 fw-normal text-gray-600">Codigo: {{ product.code }} </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
+      <!-- Filtro de busqueda -->
       <div class="card mt-24">
         <div class="card-body">
           <div class="mb-20 flex-between flex-wrap gap-8" [hidden]="showForm">
@@ -151,10 +109,11 @@
                       <div class="flex-align gap-4">
                         <span class="text-15 fw-bold text-warning-600 d-flex"><i class="ph-fill ph-code"></i></span>
                         <span class="text-13 fw-bold text-gray-600">Codigo: {{product.code}}</span>
-                        
                       </div>
-                      <span class="text-13 fw-bold text-gray-600">Stock: {{calculateStock(product.id)}}</span>
-                      
+                      <span class="text-13 fw-bold text-gray-600">Stock: {{product.stock}}</span>
+                    </div>
+                    <div class="flex-between gap-4 flex-wrap mt-24">
+                      <img [src]="product.codeBar" *ngIf="product.codeBar" alt="Código de Barras">
                     </div>
                   </div>
                 </div>
@@ -162,47 +121,6 @@
             </div>
           </div>
 
-          <!-- <div class="flex-between flex-wrap gap-8 mt-20">
-            <a href="student-courses.html#" class="btn btn-outline-gray rounded-pill py-9 flex-align gap-4">
-              <span class="d-flex text-xl"><i class="ph ph-arrow-left"></i></span>
-              Previous
-            </a>
-
-            <ul class="pagination flex-align flex-wrap">
-              <li class="page-item active">
-                <a class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium"
-                  href="student-courses.html#">1</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium"
-                  href="student-courses.html#">2</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium"
-                  href="student-courses.html#">3</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium"
-                  href="student-courses.html#">...</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium"
-                  href="student-courses.html#">8</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium"
-                  href="student-courses.html#">9</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium"
-                  href="student-courses.html#">10</a>
-              </li>
-            </ul>
-
-            <a href="student-courses.html#" class="btn btn-outline-main rounded-pill py-9 flex-align gap-4">
-              Next <span class="d-flex text-xl"><i class="ph ph-arrow-right"></i></span>
-            </a>
-          </div> -->
 
         </div>
       </div>
@@ -232,53 +150,41 @@
               </div>
               <div class="col-sm-6 col-xs-6">
                 <label for="name" class="form-label mb-8 h6">Nombre</label>
-                <input formControlName="name" type="text" class="form-control py-11" id="name"
-                  placeholder="Nombre del producto">
+                <input formControlName="name" type="text" class="form-control py-11" id="name" placeholder="Nombre del producto">
               </div>
               <div class="col-sm-6 col-xs-6">
                 <label for="code" class="form-label mb-8 h6">Codigo</label>
-                <input formControlName="code" type="number" class="form-control py-11" id="code"
-                  placeholder="Ingrese codigo">
+                <input formControlName="code" type="number" class="form-control py-11" id="code" placeholder="Ingrese codigo">
               </div>
               <div class="col-sm-6 col-xs-6">
                 <label for="description" class="form-label mb-8 h6">Descripcion</label>
-                <input formControlName="description" type="text" class="form-control py-11" id="description"
-                  placeholder="Ingrese descripcion">
+                <input formControlName="description" type="text" class="form-control py-11" id="description" placeholder="Ingrese descripcion">
               </div>
               <div class="col-sm-4 col-xs-4">
                 <label for="unity" class="form-label mb-8 h6">Unidad</label>
-                <input formControlName="unity" type="number" class="form-control py-11" id="unity"
-                  placeholder="Ingrese unidades">
+                <input formControlName="unity" type="number" class="form-control py-11" id="unity" placeholder="Ingrese unidades">
               </div>
               <div class="col-sm-4 col-xs-4">
                 <label for="price" class="form-label mb-8 h6">Precio</label>
-                <input formControlName="price" type="number" class="form-control py-11" id="price"
-                  placeholder="Ingrese precio">
+                <input formControlName="price" type="number" class="form-control py-11" id="price" placeholder="Ingrese precio">
               </div>
               <div class="col-sm-4 col-xs-4">
                 <label for="color" class="form-label mb-8 h6">Color</label>
-                <input formControlName="color" type="text" class="form-control py-11" id="color"
-                  placeholder="Ingrese color">
+                <input formControlName="color" type="text" class="form-control py-11" id="color" placeholder="Ingrese color">
               </div>
-
               <div class="col-12">
                 <label for="imageUpload" class="form-label mb-8 h6">Imagen</label>
                 <div class="flex-align gap-22">
-              
                   <div class="text-center position-relative flex-grow-1 py-24 px-4 rounded-16 border border-main-300 border-dashed bg-main-50 hover-bg-main-100 hover-border-main-400 transition-2 cursor-pointer">
                     <input type="file" (change)="onImageSelect($event)" accept="image/*" />
                     <img [src]="imagePreview" alt="Imagen previa" class="img-thumbnail" style="max-width: 150px;" *ngIf="imagePreview">
-
                   </div>
                 </div>
               </div>
-
               <div class="col-12">
                 <div class="flex-align justify-content-end gap-8">
-                  <button type="button" (click)="showForm=false"
-                    class="btn btn-outline-main bg-main-100 border-main-100 text-main-600 rounded-pill py-9">Cancelar</button>
-                  <button type="submit" class="btn btn-main rounded-pill py-9"
-                    [disabled]="!productForm.valid">Guardar</button>
+                  <button type="button" (click)="showForm=false" class="btn btn-outline-main bg-main-100 border-main-100 text-main-600 rounded-pill py-9">Cancelar</button>
+                  <button type="submit" class="btn btn-main rounded-pill py-9" [disabled]="!productForm.valid">Guardar y generar codigo de barras</button>
                 </div>
               </div>
             </div>
@@ -292,6 +198,7 @@
         </div>
 
         <div class="card-body">
+          <!-- formulario de edicion -->
           <form [formGroup]="productForm" (ngSubmit)="saveupdateProduct(currentProductId)" #productFormDir="ngForm">
             <div class="row gy-4">
               <div class="col-sm-6 col-xs-6">
