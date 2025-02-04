@@ -6,3 +6,13 @@
 .hora {
     font-weight: bold;
 }
+
+input[name="search"] {
+    width: 150%; /* Asegúrate de que el campo ocupe todo el ancho */
+}
+
+@media (max-width: 576px) {
+    input[name="search"] {
+        width: 100%; /* Asegúrate de que el campo ocupe todo el ancho en móviles */
+    }
+}

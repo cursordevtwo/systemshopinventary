@@ -45,7 +45,7 @@ export class CashComponent {
   metodoPago: string = 'efectivo';
   fechaActual: string = '';
   horaActual: string = '';
-  searchTerm: string = '';
+ /*  searchTerm: string = ''; */
   private searchSubject = new Subject<string>();
   productos: any[] = [];
   productosFiltrados: any[] = [];
@@ -73,7 +73,8 @@ export class CashComponent {
   totalStock: number = 0;
   products: any[] = [];
   ventas: any[] = [];
-  
+  searchTerm: string = '';
+  filteredProducts: any[] = [];
 
   constructor
   (public global: GlobalService,
@@ -111,6 +112,12 @@ export class CashComponent {
       }
     });
   }
+  ngAfterViewInit() {
+    const inputElement = document.querySelector('input[name="search"]') as HTMLInputElement;
+    if (inputElement) {
+        inputElement.focus(); // Establecer el enfoque al cargar el componente
+    }
+}
   deleteSale(saleId: string) {
     Swal.fire({
       title: '¿Estás seguro?',
@@ -143,12 +150,11 @@ export class CashComponent {
       }
     });
   }
-  onSearchChange(event: any) {
+ /*  onSearchChange(event: any) {
     const termino = event.target.value;
     console.log('Término de búsqueda:', termino); // Para debugging
     this.filtrarProductos(termino);
-  }
-
+  } 
   filtrarProductos(termino: string) {
     if (!termino) {
       this.productosFiltrados = [...this.productos];
@@ -161,7 +167,63 @@ export class CashComponent {
       producto.code.toLowerCase().includes(termino)
     );
     console.log('Productos filtrados:', this.productosFiltrados); // Para debugging
+  }  
+  */
+   
+  /*   onSearchChange(event: Event): void {
+      const inputElement = event.target as HTMLInputElement;
+      this.searchTerm = inputElement.value;
+    
+      // Buscar productos por nombre, código o código de barras
+      this.filteredProducts = this.products.filter((product: any) =>
+        product.name.toLowerCase().includes(this.searchTerm.toLowerCase()) || // Buscar por nombre
+        product.code.toString().includes(this.searchTerm) || // Buscar por código
+        product.codeBarra.includes(this.searchTerm) // Buscar por código de barras
+      );
+    
+      // Mostrar resultados o mensaje si no se encuentra nada
+      if (this.filteredProducts.length > 0) {
+        console.log('Productos encontrados:', this.filteredProducts);
+      } else {
+        console.log('No se encontraron productos.');
+        Swal.fire({
+          icon: 'info',
+          title: 'Información',
+          text: 'No se encontraron productos con ese nombre, código o código de barras.'
+        });
+      }
+    } */
+
+      clearSearch(): void {
+        this.searchTerm = '';
+        this.filteredProducts = this.products; // O restablecer a la lista original de productos
+    }
+    setFocus(): void {
+      const inputElement = document.querySelector('input[name="search"]') as HTMLInputElement;
+      if (inputElement) {
+          inputElement.focus(); // Establecer el enfoque en el campo de entrada
+      }
   }
+      onSearchChange(event: Event): void {
+        const inputElement = event.target as HTMLInputElement;
+        const termino = inputElement.value;
+        console.log('Término de búsqueda:', termino); // Para debugging
+        this.filtrarProductos(termino);
+    }
+  filtrarProductos(termino: string) {
+    if (!termino) {
+        this.productosFiltrados = [...this.productos];
+        return;
+    }
+
+    termino = termino.toLowerCase();
+    this.productosFiltrados = this.productos.filter(producto => 
+        producto.name.toLowerCase().includes(termino) || 
+        producto.code.toLowerCase().includes(termino) || 
+        producto.codeBarra.toLowerCase().includes(termino) // Filtrar por código de barras
+    );
+    console.log('Productos filtrados:', this.productosFiltrados); // Para debugging
+}
 
 
     seleccionarProducto(producto: any) {
@@ -306,12 +368,7 @@ export class CashComponent {
   
       this.calcularTotal();
     }
-   /*  calcularTotal() {
-      this.total = this.productosSeleccionados.reduce((total, producto) => {
-          return total + (producto.price * producto.cantidad);
-      }, 0);
-  } */
-    // Funciones para navegar entre pasos
+ 
     irAPaso(paso: number) {
       this.pasoActual = paso;
     }
@@ -365,72 +422,6 @@ export class CashComponent {
 private calculateTotalUnits(): number {
   return this.productosSeleccionados.reduce((total, producto) => total + producto.cantidad, 0);
 }
-/* procesarPago() {
-  if (!this.metodoPago || !this.customer) {
-    Swal.fire({
-      title: 'Error',
-      text: 'Por favor complete todos los campos requeridos',
-      icon: 'error',
-      confirmButtonText: 'Ok'
-    });
-    return;
-  }
-
-  // Add confirmation dialog
-  Swal.fire({
-    title: '¿Está seguro de procesar la venta?',
-    text: `Total a pagar: ₡${this.total.toFixed(2)}`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Sí, procesar',
-    cancelButtonText: 'Cancelar'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      const venta = {
-        customer: this.customer,
-        paymentMethod: this.metodoPago,
-        products: this.productosSeleccionados,
-        total: this.total,
-        idUser: this.currentUser.id,
-        unity: this.calculateTotalUnits(),
-        subTotal: this.subtotal.toString(),
-        statusVenta: "completed",
-        descuento: "0",
-        // iva: this.iva.toString(),
-        metodoPago: this.metodoPago,
-        date: new Date().toISOString(),
-        hora: this.horaActual,
-        idProduct: JSON.stringify(this.productosSeleccionados),
-      };
-
-      this.dataApiService.saveVenta(venta).subscribe(
-        (response) => {
-          Swal.fire({
-            title: '¡Venta exitosa!',
-            text: 'La venta ha sido procesada correctamente.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
-          }).then(() => {
-            this.resetearVenta();
-            this.irAPaso(1);
-          });
-        },
-        (error) => {
-          Swal.fire({
-            title: 'Error',
-            text: 'Hubo un problema al procesar la venta. Por favor, intente nuevamente.',
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-          console.error('Error:', error);
-        }
-      );
-    }
-  });
-} */
   
 private resetearVenta() {
   this.productosSeleccionados = [];
@@ -483,5 +474,7 @@ openSaleDetailsModal(venta: any) {
 calculateTotalStock(): number {
   return this.products.reduce((total, product) => total + (product.quantity || 0), 0);
 }
+
+
 
 }

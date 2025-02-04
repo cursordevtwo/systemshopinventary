@@ -155,20 +155,26 @@
                 <form class="w-350 d-sm-block d-none">
                     <!-- cash.component.html -->
                     <div class="position-relative">
-                        <!-- Input de búsqueda -->
-                        <form class="w-350 d-sm-block d-none">
-                            <div class="position-relative">
-                                <button type="submit"
-                                    class="input-icon text-xl d-flex text-gray-100 pointer-event-none">
-                                    <i class="ph ph-magnifying-glass"></i>
-                                </button>
-                                <input type="text"
-                                    class="form-control ps-40 h-40 border-transparent focus-border-main-600 bg-main-50 rounded-pill placeholder-15"
-                                    placeholder="Buscar producto por nombre o código" [(ngModel)]="searchTerm"
-                                    (input)="onSearchChange($event)" name="search">
+                            <!-- Input de búsqueda -->
+                            <div class="row col-12">
+                                <form class="w-100 d-sm-block d-none"> <!-- Asegúrate de que el formulario ocupe el 100% del ancho -->
+                                    <div class="d-flex align-items-center position-relative"> <!-- Usar d-flex para alinear en fila -->
+                                        <button type="submit" class="input-icon text-xl d-flex text-gray-100 pointer-event-none me-2">
+                                            <i class="ph ph-magnifying-glass"></i>
+                                        </button>
+                                        <input type="text"
+                                            class="form-control ps-40 h-40 border-transparent focus-border-main-600 bg-main-50 rounded-pill placeholder-15"
+                                            placeholder="Buscar producto por nombre, código o código de barras"
+                                            [(ngModel)]="searchTerm"
+                                            (input)="onSearchChange($event)"
+                                            (focus)="setFocus()" 
+                                            name="search">
+                                        <button (click)="clearSearch()" class="btn btn-outline-main ms-2">
+                                            <i class="ph ph-x"></i> 
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
-
                         <!-- Lista de productos filtrados -->
                         <div class="productos-filtrados position-absolute w-100 mt-2"
                             style="background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 1000;"
