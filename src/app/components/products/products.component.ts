@@ -14,6 +14,7 @@ import { UploadService } from '../../services/upload.service';
 import { from } from 'rxjs';
 import { BarcodeComponent } from '../barcode/barcode.component';
 import JsBarcode from 'jsbarcode'; // Use default import
+import { ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-products',
@@ -55,9 +56,8 @@ export class ProductsComponent {
     public realtimeCategorias: RealtimeCategoriasService,
     private dialog: MatDialog,
     public realtimeVentas: RealtimeVentasService,
-    public uploadService: UploadService
-
-
+    public uploadService: UploadService,
+    public productService: ProductService
   ) {
     this.realtimeProducts.products$;
 
@@ -77,11 +77,28 @@ export class ProductsComponent {
     this.loadProducts();
     this.global.applyFilters(this.selectedCategory, this.searchQuery); // Initial call to set up default view
 }
-  loadProducts() {
+  /* loadProducts() {
     this.realtimeProducts.products$.subscribe((products: any[]) => {
       // Load products if needed
     });
-  }
+  } */
+    loadProducts() {
+      // Cargar productos inicialmente
+      this.productService.getProducts().subscribe(products => {
+        this.products = products.map(product => {
+          product.file = this.uploadService.getFileUrl(product);
+          return product;
+        });
+      });
+    
+      // Suscribirse a los cambios en tiempo real
+      this.realtimeProducts.products$.subscribe((products: any[]) => {
+        this.products = products.map(product => {
+          product.file = this.uploadService.getFileUrl(product);
+          return product;
+        });
+      });
+    }
   onFilterChange() {
     this.global.applyFilters(this.selectedCategory, this.searchQuery);
   }

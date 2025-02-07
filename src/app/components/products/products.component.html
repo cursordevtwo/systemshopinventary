@@ -73,9 +73,7 @@
                 </div>
                 <div class="card-body p-8">
                   <a class="bg-main-100 rounded-8 overflow-hidden text-center mb-8 h-164 flex-center p-8">
-                    <!-- Asegúrate de que product.file[0] contiene la URL o cadena base64 de la imagen -->
-                    <img *ngIf="product.file?.length > 0" [src]="product.file[0]" alt="Imagen del Producto">
-                    
+                    <img *ngIf="product.file" [src]="product.file" alt="Imagen del Producto">
                     <button type="button" (click)="updateProduct(product.id)"
                       class="follow-btn py-2 px-8 flex-align gap-4 text-13 fw-medium text-black border border-black rounded-pill position-absolute inset-block-start-0 inset-inline-end-0 mt-8 me-8 transition-1">
                       <i class="ph ph-pencil d-flex"></i>
