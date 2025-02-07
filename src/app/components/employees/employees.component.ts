@@ -55,7 +55,7 @@ export class EmployeesComponent {
     }
   }
 
-  // Enviar el formulario para agregar un nuevo supervisor
+  // Enviar el formulario para agregar un nuevo empleado
   addNewEmployee() {
     if (this.employeeForm.invalid) {
       Swal.fire({
@@ -68,13 +68,13 @@ export class EmployeesComponent {
 
     const { fname, email, phone } = this.employeeForm.value;
 
-    // Llamar al servicio para crear el supervisor
+    // Llamar al servicio para crear el empleado
     this.auth.addEmployee(email, fname,  phone).subscribe({
       next: (result) => {
         Swal.fire({
           icon: 'success',
-          title: 'created employee',
-          text: `employee created successfully. Generated password: ${result.password}`
+          title: 'Empleado creado',
+          text: `Empleado creado exitosamente. Contraseña generada: ${result.password}`
         });
         this.employeeForm.reset();
         this.previewImage = 'assets/images/thumbs/setting-profile-img.jpg';
@@ -84,7 +84,7 @@ export class EmployeesComponent {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'There was an error creating the employee.'
+          text: 'Hubo un error al crear el empleado.'
         });
         console.error('Error when creating the employee:', error);
       }

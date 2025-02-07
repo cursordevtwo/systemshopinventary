@@ -68,13 +68,9 @@ export class ProductsComponent {
       description: ['', Validators.required],
       unity: [1, [Validators.required, Validators.min(1)]],
       price: [0, [Validators.required, Validators.min(0.01)]],
-      code: [123, Validators.required],
       stock: [0, [Validators.required, Validators.min(0)]],
-      file: [null],
       color: ['', Validators.required],
-      /* codeBarra:['', Validators.required],
-      codeBar: [123, Validators.required] */
-
+      file: [null]
     });
   }
   ngOnInit() {
@@ -104,26 +100,8 @@ export class ProductsComponent {
       }
     });
   }
-  /* showNewProduct() {
-      this.showForm = !this.showForm;
-      if (this.showForm) {
-        this.isEditing = false;
-        this.productForm.reset();
-        this.previewImage = 'assets/images/thumbs/setting-profile-img.jpg';
-        // Set default values if needed
-        this.productForm.patchValue({
-          unity: 1,
-          price: 0,
-          code: 123,
-          stock: 0,
-          color: '',
-          codeBar: 123,
-          codeBarra:''
-        });
-    }
-  } */
 
-    showNewProduct() {
+  showNewProduct() {
   this.showForm = !this.showForm;
   if (this.showForm) {
     this.isEditing = false;
@@ -133,128 +111,101 @@ export class ProductsComponent {
     this.productForm.patchValue({
       unity: 1,
       price: 0,
-      code: 123,
+      /* code: 123, */
       stock: 0,
       color: '', // Reiniciar el campo "color"
     });
   }
-}
- 
-    addProduct() {
-      if (this.productForm.valid) {
-        const file = this.productForm.get('image')?.value;
-        const initialStock = parseInt(this.productForm.get('unity')?.value);
-        const productCode = this.productForm.get('code')?.value;
-    
-        // Generar el código de barras automáticamente
-        const codeBarra = this.generateBarcode(productCode);
-    
-        // First upload the image if it exists
-        if (file) {
-          const formData = new FormData();
-          formData.append('file', file);
-    
-          this.dataApiService.uploadImage(file).subscribe({
-            next: (fileResponse: any) => {
-              // Create product with file reference
-              const productData = {
-                name: this.productForm.get('name')?.value,
-                description: this.productForm.get('description')?.value,
-                unity: initialStock,
-                price: parseFloat(this.productForm.get('price')?.value),
-                code: productCode, // Usar el código directamente
-                idCategoria: this.productForm.get('idCategoria')?.value,
-                color: this.productForm.get('color')?.value, // Incluir el campo "color"
-                collection: 'productsInventory',
-                file: fileResponse['file'],
-                stock: initialStock,
-                initialStock: initialStock,
-                codeBarra: codeBarra // Incluir el código de barras generado
-              };
-    
-              // Continue with product creation
-              this.saveProduct(productData);
-            },
-            error: (error) => {
-              console.error('Error uploading file:', error);
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error al subir la imagen. Por favor, intente nuevamente.'
-              });
-            }
-          });
-        } else {
-          // If no image, create product without image reference
-          const productData = {
-            name: this.productForm.get('name')?.value,
-            description: this.productForm.get('description')?.value,
-            unity: initialStock,
-            price: parseFloat(this.productForm.get('price')?.value),
-            code: productCode, // Usar el código directamente
-            idCategoria: this.productForm.get('idCategoria')?.value,
-            collection: 'productsInventory',
-            stock: initialStock,
-            initialStock: initialStock,
-            file: this.productForm.get('file')?.value,
-            color: this.productForm.get('color')?.value, // Incluir el campo "color"
-            codeBarra: codeBarra // Incluir el código de barras generado
-          };
-    
-          this.saveProduct(productData);
-        }
-      } else {
-        console.log('Formulario inválido');
-      }
-    }
-  async saveProduct(productData: any) {
-    try {
-      // Enviar los datos a PocketBase
-      const record = await this.uploadService.pb.collection('productsInventory').create(productData);
-  
-      console.log('Producto guardado correctamente:', record);
-      Swal.fire({
-        icon: 'success',
-        title: 'Éxito',
-        text: 'Producto guardado correctamente'
-      });
-  
-      // Resetear el formulario y ocultarlo
-      this.productForm.reset();
-      this.showForm = false;
-      this.selectedFile = null;
-      this.imagePreview = null;
-  
-      // Actualizar la lista de productos
-      this.realtimeProducts.products$ = from(this.uploadService.pb.collection('productsInventory').getFullList());
-    } catch (error) {
-      console.error('Error al guardar el producto:', error);
+  }
+  generateBarcode(): string {
+    const barcode = Math.random().toString(36).substr(2, 9);
+    const canvas = document.createElement('canvas');
+    JsBarcode(canvas, barcode, {
+      format: "CODE128",
+      lineColor: "#0aa",
+      width: 4,
+      height: 40,
+      displayValue: true
+    });
+    return canvas.toDataURL('image/png'); // Regresa la imagen en formato base64
+  }
+  addProduct() {
+    if (this.productForm.invalid) {
+      console.log('Formulario inválido', this.productForm.errors);
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pudo guardar el producto. Por favor, intente nuevamente.'
+        text: 'Por favor complete todos los campos requeridos.'
       });
+      return;
     }
-  }
-  generateBarcode(code: string): string {
-    try {
-      const canvas = document.createElement('canvas');
-      JsBarcode(canvas, code, {
-        format: 'CODE128',
-        displayValue: true,
-        fontSize: 16,
-        lineColor: '#000',
-        width: 2,
-        height: 100
-      });
   
-      return canvas.toDataURL('image/png'); // Retorna la imagen del código de barras en formato base64
-    } catch (error) {
-      console.error('Error generating barcode:', error);
-      return ''; // Retorna una cadena vacía si la generación falla
+    // Prepara los datos del producto
+    const productData = {
+      name: this.productForm.get('name')?.value,
+      description: this.productForm.get('description')?.value,
+      unity: this.productForm.get('unity')?.value,
+      price: this.productForm.get('price')?.value,
+      stock: this.productForm.get('stock')?.value,
+      color: this.productForm.get('color')?.value,
+      codeBarra: this.generateBarcode(), // Genera el código de barras único
+      idCategoria: this.productForm.get('idCategoria')?.value,
+    };
+  
+    // Llama al servicio de carga de imágenes
+    if (this.selectedFile) {
+      this.uploadService.uploadAndCreateProduct(this.selectedFile, productData).subscribe({
+        next: (result) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: 'Producto guardado correctamente'
+          });
+          this.resetForm(); // Resetear el formulario
+          this.loadProducts(); // Actualiza la lista de productos
+        },
+        error: (error) => {
+          console.error('Error al guardar el producto:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo guardar el producto. Por favor, intente nuevamente.'
+          });
+        }
+      });
+    } else {
+      // Si no hay imagen, guarda el producto sin imagen
+      this.saveProduct(productData);
     }
   }
-      updateProduct(productId: string) {
+  private resetForm() {
+    this.productForm.reset();
+    this.showForm = false;
+    this.selectedFile = null;
+    this.imagePreview = null;
+}
+async saveProduct(productData: any) {
+  try {
+      const record = await this.uploadService.pb.collection('productsInventory').create(productData);
+      console.log('Producto guardado correctamente:', record);
+      Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'Producto guardado correctamente'
+      });
+      this.resetForm(); // Resetear el formulario
+      this.loadProducts(); // Actualiza la lista de productos
+  } catch (error) {
+      console.error('Error al guardar el producto:', error);
+      Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo guardar el producto. Por favor, intente nuevamente.'
+      });
+  }
+}    
+  
+  updateProduct(productId: string) {
     this.currentProductId = productId;
     this.showForm = true;
     this.isEditing = true;
@@ -265,15 +216,14 @@ export class ProductsComponent {
       if (product) {
         this.productForm.patchValue({
           name: product.name,
-          code: product.code,
-          description: product.description,
+/*           code: product.code,
+ */          description: product.description,
           unity: product.unity,
           price: product.price,
           idCategoria: product.idCategoria,
           stock: product.stock,
           color: product.color,
           file: product.file,
-          codeBar: product.codeBar,
           codeBarra: product.codeBarra
         });
 
