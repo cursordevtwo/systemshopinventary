@@ -6,14 +6,16 @@ import { Subject } from 'rxjs';
 import { RealtimeProductsService } from '../../services/realtime-productos.service';
 import Swal from 'sweetalert2';
 import { AuthPocketbaseService } from '../../services/auth-pocketbase.service';
-import { DataApiService } from '../../services/data-api.service';
 import { RealtimeVentasService } from '../../services/realtime-ventas.service';
 import { Modal } from 'bootstrap';
 import { UploadService } from '../../services/upload.service';
 import { from } from 'rxjs';
 import QRCode from 'qrcode';
 import PocketBase from 'pocketbase';
-
+export interface PocketBaseError {
+  message: string;
+  // otras propiedades que puedas necesitar
+}
 export interface VentaInterface {
   id: string;
   customer: string;
@@ -83,7 +85,6 @@ export class CashComponent {
   (public global: GlobalService,
     public realtimeProducts: RealtimeProductsService,
     public authPocketbase: AuthPocketbaseService,
-    public dataApiService: DataApiService,
     public realtimeVentas: RealtimeVentasService,
     public uploadService: UploadService
     
@@ -124,38 +125,23 @@ export class CashComponent {
         inputElement.focus(); // Establecer el enfoque al cargar el componente
     }
 }
-  deleteSale(saleId: string) {
+deleteSale(saleId: string) {
+  this.pb.collection('ventas').delete(saleId).then(() => {
     Swal.fire({
-      title: '¿Estás seguro?',
-      text: "No podrás revertir esta acción",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.dataApiService.deleteSale(saleId).subscribe(
-          () => {
-            Swal.fire(
-              'Eliminado!',
-              'La venta ha sido eliminada.',
-              'success'
-            );
-          },
-          error => {
-            console.error('Error al eliminar la venta:', error);
-            Swal.fire(
-              'Error',
-              'No se pudo eliminar la venta.',
-              'error'
-            );
-          }
-        );
-      }
+      icon: 'success',
+      title: 'Éxito',
+      text: 'Venta eliminada correctamente'
     });
-  }
+    // Aquí puedes actualizar tu lista de ventas si es necesario
+  }).catch((error: PocketBaseError) => { // Usar un tipo específico
+    console.error('Error al eliminar la venta:', error.message);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo eliminar la venta. Por favor, intente nuevamente.'
+    });
+  });
+}
   clearSearch(): void {
     this.searchTerm = '';
     this.filteredProducts = this.products; // O restablecer a la lista original de productos
@@ -279,6 +265,56 @@ filtrarProductos(termino: string) {
       this.calcularTotal();
     }
 
+   /*  procesarPago() {
+      if (!this.metodoPago || !this.customer) {
+        Swal.fire({
+          title: 'Error',
+          text: 'Por favor complete todos los campos requeridos',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        return;
+      }
+    
+      // Agregar cuadro de confirmación
+      Swal.fire({
+        title: '¿Está seguro de procesar la venta?',
+        text: `Total a pagar: ₡${this.total.toFixed(2)}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, procesar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const venta = {
+            customer: this.customer,
+            paymentMethod: this.metodoPago,
+            products: this.productosSeleccionados,
+            total: this.total,
+            idUser: this.currentUser.id,
+            unity: this.calculateTotalUnits(),
+            subTotal: this.subtotal.toString(),
+            statusVenta: "completed",
+            descuento: "0",
+            metodoPago: this.metodoPago,
+            date: new Date().toISOString(),
+            hora: this.horaActual,
+            idProduct: JSON.stringify(this.productosSeleccionados),
+            iva: this.iva.toString(),
+            // Aquí puedes dejar el ID vacío si es generado en el backend
+          };
+    
+          // Llama a la función para procesar la venta y generar el código QR
+          this.processSaleWithQRCode(venta).then(() => {
+            this.resetearVenta();
+            this.irAPaso(1);
+          });
+        }
+      });
+    } */
+    
       procesarPago() {
         if (!this.metodoPago || !this.customer) {
           Swal.fire({
@@ -373,7 +409,6 @@ processSaleWithQRCode(venta: any): Promise<void> {
         idUser: venta.idUser,
         qrCode: file, // El archivo QR
       };
-      
       pb.collection('ventas').create(ventaData).then((record) => {
         console.log('Venta guardada exitosamente:', record);
         resolve(); // Resuelve la promesa
@@ -461,72 +496,7 @@ processSaleWithQRCode(venta: any): Promise<void> {
 private calculateTotalUnits(): number {
   return this.productosSeleccionados.reduce((total, producto) => total + producto.cantidad, 0);
 }
-/* procesarPago() {
-  if (!this.metodoPago || !this.customer) {
-    Swal.fire({
-      title: 'Error',
-      text: 'Por favor complete todos los campos requeridos',
-      icon: 'error',
-      confirmButtonText: 'Ok'
-    });
-    return;
-  }
 
-  // Add confirmation dialog
-  Swal.fire({
-    title: '¿Está seguro de procesar la venta?',
-    text: `Total a pagar: ₡${this.total.toFixed(2)}`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Sí, procesar',
-    cancelButtonText: 'Cancelar'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      const venta = {
-        customer: this.customer,
-        paymentMethod: this.metodoPago,
-        products: this.productosSeleccionados,
-        total: this.total,
-        idUser: this.currentUser.id,
-        unity: this.calculateTotalUnits(),
-        subTotal: this.subtotal.toString(),
-        statusVenta: "completed",
-        descuento: "0",
-        // iva: this.iva.toString(),
-        metodoPago: this.metodoPago,
-        date: new Date().toISOString(),
-        hora: this.horaActual,
-        idProduct: JSON.stringify(this.productosSeleccionados),
-      };
-
-      this.dataApiService.saveVenta(venta).subscribe(
-        (response) => {
-          Swal.fire({
-            title: '¡Venta exitosa!',
-            text: 'La venta ha sido procesada correctamente.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
-          }).then(() => {
-            this.resetearVenta();
-            this.irAPaso(1);
-          });
-        },
-        (error) => {
-          Swal.fire({
-            title: 'Error',
-            text: 'Hubo un problema al procesar la venta. Por favor, intente nuevamente.',
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-          console.error('Error:', error);
-        }
-      );
-    }
-  });
-} */
   
 private resetearVenta() {
   this.productosSeleccionados = [];

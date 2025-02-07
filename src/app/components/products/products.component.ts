@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { GlobalService } from '../../services/global.service';
-import { DataApiService } from '../../services/data-api.service';
 import { AuthPocketbaseService } from '../../services/auth-pocketbase.service';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -15,7 +14,13 @@ import { from } from 'rxjs';
 import { BarcodeComponent } from '../barcode/barcode.component';
 import JsBarcode from 'jsbarcode'; // Use default import
 import { ProductService } from '../../services/product.service';
+import PocketBase from 'pocketbase';
 
+
+export interface PocketBaseError {
+  message: string;
+  // otras propiedades que puedas necesitar
+}
 @Component({
   selector: 'app-products',
   standalone: true,
@@ -46,19 +51,20 @@ export class ProductsComponent {
   productosFiltrados: any[] = [];
   productos$: any;
   searchTerm: string = '';
-
+  private pb: PocketBase;
   constructor(
     public global: GlobalService,
     private fb: FormBuilder,
     public auth: AuthPocketbaseService,
     public realtimeProducts: RealtimeProductsService,
-    public dataApiService: DataApiService,
     public realtimeCategorias: RealtimeCategoriasService,
     private dialog: MatDialog,
     public realtimeVentas: RealtimeVentasService,
     public uploadService: UploadService,
     public productService: ProductService
   ) {
+    this.pb = new PocketBase('https://db.buckapi.com:8095'); // Inicializa PocketBase
+
     this.realtimeProducts.products$;
 
     // Configurar el formulario con validadores
@@ -328,28 +334,33 @@ async saveProduct(productData: any) {
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        this.dataApiService.deleteProduct(productId).subscribe({
-          next: async (response) => {
-            console.log('Producto eliminado exitosamente:', response);
-            this.realtimeProducts.products$ = from(this.uploadService.pb.collection('productsInventory').getFullList());
-            this.cancelEdit();
-            Swal.fire(
-              '¡Eliminado!',
-              'El producto ha sido eliminado.',
-              'success'
-            );
-          },
-          error: (error) => {
-            console.error('Error al eliminar:', error);
-            Swal.fire(
-              'Error',
-              'No se pudo eliminar el producto.',
-              'error'
-            );
-          }
-        });
+        try {
+          // Eliminar el producto usando PocketBase
+          await this.pb.collection('productsInventory').delete(productId);
+          
+          console.log('Producto eliminado exitosamente:', productId);
+          
+          // Actualizar la lista de productos
+          this.realtimeProducts.products$ = from(this.pb.collection('productsInventory').getFullList());
+          
+          // Cancelar la edición si es necesario
+          this.cancelEdit();
+          
+          Swal.fire(
+            '¡Eliminado!',
+            'El producto ha sido eliminado.',
+            'success'
+          );
+        } catch (error: any) { // O simplemente catch (error) {
+          console.error('Error al eliminar:', error.message);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo eliminar el producto. Por favor, intente nuevamente.'
+          });
+        }
       }
     });
   }
