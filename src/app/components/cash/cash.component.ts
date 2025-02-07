@@ -373,6 +373,7 @@ processSaleWithQRCode(venta: any): Promise<void> {
         idUser: venta.idUser,
         qrCode: file, // El archivo QR
       };
+      
       pb.collection('ventas').create(ventaData).then((record) => {
         console.log('Venta guardada exitosamente:', record);
         resolve(); // Resuelve la promesa

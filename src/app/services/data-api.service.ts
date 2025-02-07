@@ -17,6 +17,11 @@ export interface ventaInterface{
   iva: number;
   total: number;
   idEmpleado: string;
+  qrCodeUrl: string;
+  qrCode: string;
+  unity: number;
+  subTotal: string;
+  statusVenta: string;
   productos: {
     idProducto: string;
     cantidad: number;
