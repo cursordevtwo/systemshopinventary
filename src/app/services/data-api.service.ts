@@ -8,6 +8,21 @@ import { ProductService } from './product.service';
 export interface productInterface{
 }
 export interface ventaInterface{
+  id: string;
+  customer: string;
+  date: string;
+  hora: string;
+  metodoPago: string;
+  subtotal: number;
+  iva: number;
+  total: number;
+  idEmpleado: string;
+  productos: {
+    idProducto: string;
+    cantidad: number;
+    precio: number;
+    subtotal: number;
+  }[];
 }
 export interface employeeInterface{
 }

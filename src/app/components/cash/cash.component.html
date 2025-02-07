@@ -90,7 +90,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <ng-container *ngFor="let venta of (realtimeVentas.ventas$ | async)">
+                                                <!-- <ng-container *ngFor="let venta of (realtimeVentas.ventas$ | async)">
                                                     <tr>
                                                         <td>{{venta.date | date:'short'}}</td>  
                                                          <td>{{venta.customer}}</td>
@@ -99,8 +99,28 @@
                                                         <td>
                                                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#openSaleDetailsModal" (click)="openSaleDetailsModal(venta)">Ver</button>
                                                         </td>
+                                                        <td><div id="codigo-qr"></div></td>
                                                     </tr>
-                                                </ng-container>
+
+                                                </ng-container> -->
+                                                <ng-container *ngFor="let venta of (realtimeVentas.ventas$ | async)">
+                                                    <tr>
+                                                      <td>{{venta.date | date:'short'}}</td>  
+                                                      <td>{{venta.customer}}</td>
+                                                      <td>{{venta.idProduct && venta.idProduct.length > 0 ? venta.idProduct[0].name : ''}}</td>                                                     
+                                                      <td>₡ {{venta.total | number:'1.2-2'}}</td>                                      
+                                                      <td>
+                                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#openSaleDetailsModal" (click)="openSaleDetailsModal(venta)">
+                                                          Ver
+                                                        </button>
+                                                      </td>
+                                                      <td>
+                                                        <!-- Mostrar el código QR solo si está disponible -->
+                                                        <img *ngIf="venta.qrCodeUrl" [src]="venta.qrCodeUrl" alt="Código QR de la venta" />
+                                                    </td>
+                                                    </tr>
+                                                  </ng-container>
+                                                  
                                                 <ng-template #loadingSales>
                                                     <tr>
                                                         <td colspan="3" class="text-center">Cargando ventas...</td>
