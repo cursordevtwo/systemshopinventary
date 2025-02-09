@@ -65,7 +65,7 @@ export class ProductsComponent {
   ) {
     this.pb = new PocketBase('https://db.buckapi.com:8095'); // Inicializa PocketBase
 
-    this.realtimeProducts.products$;
+    this.realtimeProducts.products$ = from(this.pb.collection('productsInventory').getFullList());
 
     // Configurar el formulario con validadores
     this.productForm = this.fb.group({

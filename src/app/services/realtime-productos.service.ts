@@ -1,59 +1,64 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import PocketBase from 'pocketbase';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class RealtimeProductsService implements OnDestroy {
+export class RealtimeProductsService {
   private pb: PocketBase;
   private productsSubject = new BehaviorSubject<any[]>([]);
-
-  // Esta es la propiedad que expondrá el Observable para que los componentes puedan suscribirse a ella
-  public products$: Observable<any[]> =
-    this.productsSubject.asObservable();
+  public products$ = this.productsSubject.asObservable();
 
   constructor() {
     this.pb = new PocketBase('https://db.buckapi.com:8095');
-    this.subscribeToProducts();
-  }
-
-  private async subscribeToProducts() {
-    // (Opcional) Autenticación
-    await this.pb
-      .collection('users')
-      .authWithPassword('admin@email.com', 'admin1234');
-
-    // Suscribirse a cambios en cualquier registro de la colección 'supervisors'
-    this.pb.collection('productsInventory').subscribe('*', (e) => {
-      this.handleRealtimeEvent(e);
-    });
-
-    // Inicializar la lista de productos
-    this.updateProductsList();
-  }
-
-  private handleRealtimeEvent(event: any) {
-    // Aquí puedes manejar las acciones 'create', 'update' y 'delete'
-    console.log(event.action);
-    console.log(event.record);
-
-    // Actualizar la lista de productos
-    this.updateProductsList();
-  }
-
-  private async updateProductsList() {
-    // Obtener la lista actualizada de productos
-    const records = await this.pb
-      .collection('productsInventory')
-      .getFullList(200 /* cantidad máxima de registros */, {
-        sort: '-created', // Ordenar por fecha de creación
+    
+    // Autenticación
+    this.pb.collection('users')
+      .authWithPassword('admin@email.com', 'admin1234')
+      .then(() => {
+        console.log('Autenticado');
+        this.subscribeToRealtimeChanges();
+      })
+      .catch(err => {
+        console.error('Error al autenticar:', err);
       });
-    this.productsSubject.next(records);
   }
 
-  ngOnDestroy() {
-    // Desuscribirse cuando el servicio se destruye
+  private subscribeToRealtimeChanges(): void {
+    // Obtener todos los registros existentes
+    this.pb.collection('productsInventory').getList(1, 50).then(records => {
+      this.productsSubject.next(records.items);
+      
+      // Suscribirse a los cambios en tiempo real
+      this.pb.collection('productsInventory').subscribe('*', (e) => {
+        console.log(e.action, e.record);
+        
+        const currentProducts = this.productsSubject.value;
+        let updatedProducts;
+
+        switch (e.action) {
+          case 'create':
+            updatedProducts = [...currentProducts, e.record];
+            break;
+          case 'update':
+            updatedProducts = currentProducts.map(req => 
+              req.id === e.record.id ? e.record : req
+            );
+            break;
+          case 'delete':
+            updatedProducts = currentProducts.filter(req => req.id !== e.record.id);
+            break;
+          default:
+            updatedProducts = currentProducts;
+        }
+
+        this.productsSubject.next(updatedProducts);
+      });
+    });
+  }
+
+  public unsubscribeFromRealtimeChanges(): void {
     this.pb.collection('productsInventory').unsubscribe('*');
   }
 }
